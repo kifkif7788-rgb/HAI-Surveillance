@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/frontend-trigger.sh",
+            "statusMessage": "Checking frontend skill...",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

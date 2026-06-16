@@ -1,0 +1,203 @@
+@import "tailwindcss" source(none);
+@import "tw-animate-css";
+
+@source "../src";
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using oklch.
+ * All colors MUST use oklch format.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-pink: var(--pink);
+  --color-pink-foreground: var(--pink-foreground);
+  --color-mint: var(--mint);
+  --color-mint-foreground: var(--mint-foreground);
+  --color-sky: var(--sky);
+  --color-sky-foreground: var(--sky-foreground);
+  --color-lemon: var(--lemon);
+  --color-lemon-foreground: var(--lemon-foreground);
+  --color-lavender: var(--lavender);
+  --color-lavender-foreground: var(--lavender-foreground);
+  --color-orange-soft: var(--orange-soft);
+  --color-orange-soft-foreground: var(--orange-soft-foreground);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  --header-h: 60px;       /* fallback — overridden by ResizeObserver in AppLayout */
+  --content-gap: 0.75rem; /* = header mb-3, vertical gap below header (content + panel align) */
+  --panel-w: 360px;
+  --panel-gap: 1.5rem;    /* horizontal gutter: panel ↔ viewport edge & panel ↔ content */
+  --radius: 0.625rem;
+  --background: oklch(0.985 0.015 230);
+  --foreground: oklch(0.32 0.05 280);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.32 0.05 280);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.32 0.05 280);
+  --primary: oklch(0.72 0.14 220);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.93 0.06 340);
+  --secondary-foreground: oklch(0.38 0.08 340);
+  --muted: oklch(0.96 0.02 250);
+  --muted-foreground: oklch(0.55 0.04 270);
+  --accent: oklch(0.9 0.08 160);
+  --accent-foreground: oklch(0.32 0.08 160);
+  --destructive: oklch(0.7 0.18 20);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.92 0.03 250);
+  --input: oklch(0.95 0.02 250);
+  --ring: oklch(0.78 0.12 220);
+  --pink: oklch(0.88 0.09 350);
+  --pink-foreground: oklch(0.42 0.12 350);
+  --mint: oklch(0.9 0.09 165);
+  --mint-foreground: oklch(0.36 0.1 165);
+  --sky: oklch(0.9 0.07 230);
+  --sky-foreground: oklch(0.38 0.12 235);
+  --lemon: oklch(0.94 0.1 95);
+  --lemon-foreground: oklch(0.45 0.12 80);
+  --lavender: oklch(0.9 0.07 300);
+  --lavender-foreground: oklch(0.4 0.12 300);
+  --orange-soft: oklch(0.88 0.12 55);
+  --orange-soft-foreground: oklch(0.45 0.14 45);
+  --gradient-bg: linear-gradient(145deg, oklch(0.98 0.025 210) 0%, oklch(0.975 0.03 330) 40%, oklch(0.98 0.025 170) 80%, oklch(0.975 0.02 250) 100%);
+  --shadow-soft: 0 8px 24px -8px oklch(0.7 0.1 280 / 0.25);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.984 0.003 247.858);
+  --sidebar-foreground: oklch(0.129 0.042 264.695);
+  --sidebar-primary: oklch(0.208 0.042 265.755);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.968 0.007 247.896);
+  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
+  --sidebar-border: oklch(0.929 0.013 255.508);
+  --sidebar-ring: oklch(0.704 0.04 256.788);
+}
+
+.dark {
+  --background: oklch(0.129 0.042 264.695);
+  --foreground: oklch(0.984 0.003 247.858);
+  --card: oklch(0.208 0.042 265.755);
+  --card-foreground: oklch(0.984 0.003 247.858);
+  --popover: oklch(0.208 0.042 265.755);
+  --popover-foreground: oklch(0.984 0.003 247.858);
+  --primary: oklch(0.929 0.013 255.508);
+  --primary-foreground: oklch(0.208 0.042 265.755);
+  --secondary: oklch(0.279 0.041 260.031);
+  --secondary-foreground: oklch(0.984 0.003 247.858);
+  --muted: oklch(0.279 0.041 260.031);
+  --muted-foreground: oklch(0.704 0.04 256.788);
+  --accent: oklch(0.279 0.041 260.031);
+  --accent-foreground: oklch(0.984 0.003 247.858);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.551 0.027 264.364);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.208 0.042 265.755);
+  --sidebar-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.279 0.041 260.031);
+  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.551 0.027 264.364);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    background-image: var(--gradient-bg);
+    background-attachment: fixed;
+    font-family: "Mali", "Sarabun", "Prompt", system-ui, sans-serif;
+  }
+}
+
+/* Record view: right offset for fixed summary panel (xl+) */
+@media (min-width: 1280px) {
+  .record-center {
+    /* main already has p-5 (20px) right padding, so add only panel-w + one gap */
+    padding-right: calc(var(--panel-w) + var(--panel-gap));
+  }
+}
+
+.card-soft {
+  background: oklch(1 0 0 / 0.92);
+  backdrop-filter: blur(10px);
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px -6px oklch(0.7 0.08 280 / 0.15), 0 1px 4px oklch(0.7 0.08 280 / 0.08);
+  border: 1px solid oklch(1 0 0 / 0.7);
+}
+
+.btn-soft {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.55rem 1rem; border-radius: 1rem;
+  font-weight: 600; font-size: 0.875rem;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+}
+.btn-soft:hover { transform: translateY(-1px) scale(1.02); }
+.btn-soft:active { transform: scale(0.98); }
