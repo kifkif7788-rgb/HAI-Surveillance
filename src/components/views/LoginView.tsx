@@ -105,12 +105,6 @@ export function LoginView() {
             </button>
           </form>
 
-          {/* Demo hint */}
-          <div className="mt-5 pt-4 border-t border-border/50 text-center">
-            <p className="text-[11px] text-muted-foreground">
-              บัญชีทดลอง: <span className="font-semibold text-foreground/70">admin</span> / <span className="font-semibold text-foreground/70">1234</span>
-            </p>
-          </div>
         </div>
 
         <p className="text-center text-[10px] text-muted-foreground mt-4">v1.0 • โรงพยาบาลเด็ก 💖</p>
