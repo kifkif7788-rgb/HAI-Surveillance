@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { WARD_RENAMES } from "./hai-store";
 import { sbAll, sbReplaceAll } from "./supabase";
+import { logActivity } from "./activity-store";
 
 /**
  * Client-side auth for the demo app (no backend).
@@ -97,10 +98,16 @@ export function login(username: string, password: string): User | null {
   const user = readUsers().find((u) => u.username.toLowerCase() === username.trim().toLowerCase());
   if (!user || user.passHash !== hash(password)) return null;
   setSession(user.id);
+  void logActivity({ userId: user.id, username: user.username, name: user.name, role: user.role, action: "login" });
   return user;
 }
 
 export function logout() {
+  const id = localStorage.getItem(SESSION_KEY);
+  if (id) {
+    const user = readUsers().find((u) => u.id === id);
+    if (user) void logActivity({ userId: user.id, username: user.username, name: user.name, role: user.role, action: "logout" });
+  }
   setSession(null);
 }
 

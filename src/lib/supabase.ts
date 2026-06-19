@@ -26,7 +26,7 @@ export const supabase: SupabaseClient | null =
 
 export const supabaseReady = !!supabase;
 
-export type TableName = "records" | "users" | "monthly" | "or_monthly" | "departments" | "wards" | "kpi_manual";
+export type TableName = "records" | "users" | "monthly" | "or_monthly" | "departments" | "wards" | "kpi_manual" | "activity_log";
 
 /** Fetch all rows of a JSONB table → array of domain objects (with id). Returns null if not configured/failed. */
 export async function sbAll<T extends { id: string }>(table: TableName): Promise<T[] | null> {

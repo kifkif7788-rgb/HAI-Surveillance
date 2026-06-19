@@ -9,7 +9,8 @@ create table if not exists monthly      ( id text primary key, data jsonb not nu
 create table if not exists or_monthly   ( id text primary key, data jsonb not null, updated_at timestamptz default now() );
 create table if not exists departments  ( id text primary key, data jsonb not null, updated_at timestamptz default now() );
 create table if not exists wards        ( id text primary key, data jsonb not null, updated_at timestamptz default now() );
-create table if not exists kpi_manual   ( id text primary key, data jsonb not null, updated_at timestamptz default now() );
+create table if not exists kpi_manual    ( id text primary key, data jsonb not null, updated_at timestamptz default now() );
+create table if not exists activity_log  ( id text primary key, data jsonb not null, updated_at timestamptz default now() );
 
 -- เปิด Row Level Security
 alter table records     enable row level security;
@@ -25,7 +26,7 @@ alter table wards       enable row level security;
 do $$
 declare t text;
 begin
-  foreach t in array array['records','users','monthly','or_monthly','departments','wards','kpi_manual'] loop
+  foreach t in array array['records','users','monthly','or_monthly','departments','wards','kpi_manual','activity_log'] loop
     execute format('drop policy if exists "anon_all_%1$s" on %1$s;', t);
     execute format('create policy "anon_all_%1$s" on %1$s for all to anon using (true) with check (true);', t);
   end loop;
