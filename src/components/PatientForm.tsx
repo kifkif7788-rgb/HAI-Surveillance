@@ -1,7 +1,8 @@
-import { type ReactNode } from "react";
+import { type ReactNode, useRef, useState } from "react";
 import { type PatientRecord } from "@/lib/hai-types";
 import { useWardNames } from "@/lib/ward-store";
 import { ThaiDatePicker } from "@/components/ui/ThaiDatePicker";
+import { ocrPatientLabel } from "@/lib/ocr";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -11,11 +12,61 @@ interface Props {
 
 export function PatientForm({ data, onChange }: Props) {
   const wards = useWardNames();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [ocrState, setOcrState] = useState<"idle" | "loading" | "done" | "error">("idle");
+  const [ocrPct,   setOcrPct]   = useState(0);
+
+  const handleOCR = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = "";   // reset input
+    setOcrState("loading");
+    setOcrPct(0);
+    try {
+      const result = await ocrPatientLabel(file, setOcrPct);
+      const patch: Partial<PatientRecord> = {};
+      if (result.hn)        patch.hn        = result.hn;
+      if (result.an)        patch.an        = result.an;
+      if (result.firstName) patch.firstName = result.firstName;
+      if (result.lastName)  patch.lastName  = result.lastName;
+      if (result.age !== "") patch.age      = result.age;
+      if (result.sex)       patch.sex       = result.sex;
+      onChange(patch);
+      setOcrState("done");
+      setTimeout(() => setOcrState("idle"), 3000);
+    } catch {
+      setOcrState("error");
+      setTimeout(() => setOcrState("idle"), 3000);
+    }
+  };
+
   return (
     <section className="card-soft p-5 lg:p-6 relative">
       {/* Section badge */}
       <div className="absolute -top-3.5 left-5 bg-pink text-pink-foreground rounded-full px-5 py-1 text-sm font-bold shadow-md flex items-center gap-1.5">
         🧸 ข้อมูลผู้ป่วย
+      </div>
+
+      {/* OCR Button */}
+      <div className="flex justify-end mb-3">
+        <input ref={fileRef} type="file" accept="image/*" capture="environment"
+          className="hidden" onChange={handleOCR} />
+        <button
+          type="button"
+          onClick={() => fileRef.current?.click()}
+          disabled={ocrState === "loading"}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 rounded-2xl text-sm font-semibold border-2 transition-all",
+            ocrState === "done"    ? "bg-mint border-mint-foreground/50 text-mint-foreground" :
+            ocrState === "error"   ? "bg-pink border-pink-foreground/50 text-pink-foreground" :
+            ocrState === "loading" ? "bg-lemon border-lemon-foreground/50 text-lemon-foreground animate-pulse" :
+            "bg-sky border-sky-foreground/30 text-sky-foreground hover:scale-[1.02]",
+          )}>
+          {ocrState === "loading" ? `📷 กำลัง OCR… ${ocrPct}%` :
+           ocrState === "done"    ? "✅ อ่านสติ๊กเกอร์สำเร็จ" :
+           ocrState === "error"   ? "❌ อ่านไม่ได้ ลองใหม่" :
+           "📷 สแกนสติ๊กเกอร์ผู้ป่วย"}
+        </button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-3">
