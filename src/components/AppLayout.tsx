@@ -124,7 +124,7 @@ export function AppLayout({
               <span className="text-[28px] leading-none self-end">🌿</span>
               <span className="text-[20px] leading-none self-end mb-0.5">🌸</span>
             </div>
-            <p className="text-center text-[10px] text-muted-foreground mt-1">v1.0 • โรงพยาบาลเด็ก 💖</p>
+            <p className="text-center text-[10px] text-muted-foreground mt-1">v1.0 • PH/HI มหาวิทยาลัยมหิดล 💖</p>
           </div>
         </aside>
 

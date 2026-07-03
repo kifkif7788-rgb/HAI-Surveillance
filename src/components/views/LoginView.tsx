@@ -107,7 +107,7 @@ export function LoginView() {
 
         </div>
 
-        <p className="text-center text-[10px] text-muted-foreground mt-4">v1.0 • โรงพยาบาลเด็ก 💖</p>
+        <p className="text-center text-[10px] text-muted-foreground mt-4">v1.0 • PH/HI มหาวิทยาลัยมหิดล 💖</p>
       </div>
     </div>
   );
