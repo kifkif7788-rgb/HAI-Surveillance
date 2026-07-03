@@ -14,7 +14,7 @@ import { OR_DEPTS } from "@/lib/or-store";
 import { cn } from "@/lib/utils";
 
 const EMOJI_CHOICES = ["👩‍⚕️", "👨‍⚕️", "🧑‍⚕️", "🧑‍💻", "👩‍💼", "👨‍💼", "🧸", "🐰"];
-const OTHER_DEPTS = ["OPD", "แพทย์ที่ปรึกษา", "หัวหน้างาน/ที่ปรึกษา", "LAP", "แผนกอื่นๆ"];
+const OTHER_DEPTS = ["OPD", "แพทย์ที่ปรึกษา", "หัวหน้างาน/ที่ปรึกษา", "LAB", "แผนกอื่นๆ"];
 
 export function UsersView({ currentUserId }: { currentUserId: string }) {
   const users = useUsers();
