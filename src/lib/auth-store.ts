@@ -207,6 +207,56 @@ export function generateWardAccounts(wards: string[]): { created: number } {
   return { created };
 }
 
+export interface NCodeAccount {
+  username: string; // N1, N2, ...
+  name: string;
+  role: string;     // ward / dept
+  password: string;
+}
+
+/**
+ * Create one account per ward using sequential N-code usernames (N1, N2, N3...).
+ * Skips wards that already have any account. Returns the newly created accounts
+ * (with plaintext password) so the admin can display/copy them.
+ */
+export function generateNCodeAccounts(wards: string[]): NCodeAccount[] {
+  const users = readUsers();
+
+  // wards that already have at least one non-admin account
+  const haveWard = new Set(users.filter((u) => !u.isAdmin).map((u) => u.role));
+
+  // find the next available N-number
+  const usedNums = users
+    .map((u) => u.username.match(/^[Nn](\d+)$/))
+    .filter(Boolean)
+    .map((m) => parseInt(m![1], 10));
+  let nextN = usedNums.length > 0 ? Math.max(...usedNums) + 1 : 1;
+
+  const created: NCodeAccount[] = [];
+
+  for (const ward of wards) {
+    if (haveWard.has(ward)) continue; // skip if ward already has an account
+    const username = `N${nextN++}`;
+    const pw = generatePassword();
+    const account: NCodeAccount = { username, name: ward, role: ward, password: pw };
+    users.push({
+      id: crypto.randomUUID(),
+      username,
+      name: ward,
+      role: ward,
+      emoji: "🧑‍⚕️",
+      isAdmin: false,
+      passHash: hash(pw),
+      password: pw,
+    });
+    haveWard.add(ward);
+    created.push(account);
+  }
+
+  if (created.length > 0) writeUsers(users);
+  return created;
+}
+
 export function deleteUser(id: string): Result {
   const users = readUsers();
   const u = users.find((x) => x.id === id);

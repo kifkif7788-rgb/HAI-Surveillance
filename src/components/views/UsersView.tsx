@@ -6,7 +6,8 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  useUsers, createUser, updateUser, deleteUser, generateWardAccounts, type User,
+  useUsers, createUser, updateUser, deleteUser, generateWardAccounts, generateNCodeAccounts,
+  type User, type NCodeAccount,
 } from "@/lib/auth-store";
 import { useWardNames, wardNames } from "@/lib/ward-store";
 import { OR_DEPTS } from "@/lib/or-store";
@@ -17,9 +18,10 @@ const OTHER_DEPTS = ["OPD", "แพทย์ที่ปรึกษา", "ห�
 
 export function UsersView({ currentUserId }: { currentUserId: string }) {
   const users = useUsers();
-  const [editing, setEditing]   = useState<User | "new" | null>(null);
-  const [toDelete, setToDelete] = useState<User | null>(null);
-  const [showLog, setShowLog]   = useState(false);
+  const [editing, setEditing]         = useState<User | "new" | null>(null);
+  const [toDelete, setToDelete]       = useState<User | null>(null);
+  const [showLog, setShowLog]         = useState(false);
+  const [nCodeResult, setNCodeResult] = useState<NCodeAccount[] | null>(null);
 
   const confirmDelete = () => {
     if (!toDelete) return;
@@ -44,6 +46,18 @@ export function UsersView({ currentUserId }: { currentUserId: string }) {
             title="สร้างบัญชี 1 บัญชีต่อแผนกที่ยังไม่มี">
             <Building2 className="w-4 h-4" />
             สร้างบัญชีรายแผนก
+          </button>
+          <button
+            onClick={() => {
+              const allWards = [...wardNames(), ...OR_DEPTS];
+              const result = generateNCodeAccounts(allWards);
+              if (result.length === 0) toast.info("ทุกแผนกมีบัญชีอยู่แล้ว");
+              else { toast.success(`สร้างบัญชี N-code ใหม่ ${result.length} บัญชี`); setNCodeResult(result); }
+            }}
+            className="btn-soft bg-lavender text-lavender-foreground gap-2 px-4 text-sm"
+            title="สร้างบัญชี N1,N2,N3... บัญชีละแผนก">
+            <UserPlus className="w-4 h-4" />
+            สร้างบัญชี N-code
           </button>
           <button
             onClick={() => setEditing("new")}
@@ -111,6 +125,57 @@ export function UsersView({ currentUserId }: { currentUserId: string }) {
           isSelf={editing !== "new" && editing.id === currentUserId}
           onClose={() => setEditing(null)}
         />
+      )}
+
+      {/* N-code result modal */}
+      {nCodeResult !== null && (
+        <Dialog open onOpenChange={(o) => { if (!o) setNCodeResult(null); }}>
+          <DialogContent className="sm:max-w-lg rounded-3xl max-h-[85vh] flex flex-col p-0 gap-0">
+            <DialogHeader className="px-6 pt-6 pb-4 border-b border-border/40 shrink-0">
+              <div className="mx-auto text-4xl mb-1">🔐</div>
+              <DialogTitle className="text-center">บัญชี N-code ที่สร้างใหม่</DialogTitle>
+              <DialogDescription className="text-center text-xs">
+                {nCodeResult.length} บัญชี — บันทึกรหัสผ่านไว้ก่อนปิด จะไม่แสดงอีก
+              </DialogDescription>
+            </DialogHeader>
+            <div className="overflow-y-auto flex-1 px-6 py-4">
+              <table className="w-full text-sm border-collapse">
+                <thead>
+                  <tr className="text-xs text-muted-foreground border-b border-border/40">
+                    <th className="text-left py-2 pr-4 font-semibold">Username</th>
+                    <th className="text-left py-2 pr-4 font-semibold">แผนก / หอผู้ป่วย</th>
+                    <th className="text-left py-2 font-semibold">รหัสผ่าน</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/30">
+                  {nCodeResult.map((acc) => (
+                    <tr key={acc.username} className="hover:bg-muted/20">
+                      <td className="py-2 pr-4 font-bold text-lavender-foreground">{acc.username}</td>
+                      <td className="py-2 pr-4 text-foreground/80 text-xs">{acc.role}</td>
+                      <td className="py-2">
+                        <code className="bg-muted px-2 py-0.5 rounded-lg text-xs font-mono">{acc.password}</code>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <DialogFooter className="px-6 py-4 border-t border-border/30 shrink-0">
+              <button
+                onClick={() => {
+                  const text = nCodeResult.map((a) => `${a.username}\t${a.role}\t${a.password}`).join("\n");
+                  navigator.clipboard.writeText(text);
+                  toast.success("คัดลอกแล้ว");
+                }}
+                className="btn-soft bg-mint text-mint-foreground flex-1 justify-center">
+                📋 คัดลอกทั้งหมด
+              </button>
+              <button onClick={() => setNCodeResult(null)} className="btn-soft bg-primary text-primary-foreground flex-1 justify-center">
+                ปิด
+              </button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
 
       {/* Delete confirm */}
