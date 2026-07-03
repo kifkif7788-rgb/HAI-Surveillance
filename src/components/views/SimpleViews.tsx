@@ -8,6 +8,7 @@ import {
 } from "@/lib/ward-store";
 import { useMonthlyStats, type MonthlyStat } from "@/lib/monthly-store";
 import { supabaseReady } from "@/lib/supabase";
+import { updateUser } from "@/lib/auth-store";
 import { useRecords } from "@/lib/hai-store";
 import { useORStats, type ORMonthlyStat } from "@/lib/or-store";
 import { categorize, categorizeAll, computeMonthlyRates, overallRate, deviceSummary, computeSSIRates, overallSSIRate } from "@/lib/hai-stats";
@@ -986,9 +987,12 @@ function Stat({ label, value, tone }: { label: string; value: number; tone: stri
 const settingsInput =
   "px-3 py-2 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-ring";
 
-export function SettingsView({ isAdmin = false }: { isAdmin?: boolean }) {
+export function SettingsView({ isAdmin = false, currentUserId }: { isAdmin?: boolean; currentUserId?: string }) {
   return (
     <div className="space-y-5">
+      {/* เปลี่ยนรหัสผ่าน */}
+      {currentUserId && <ChangePasswordCard userId={currentUserId} />}
+
       {/* สถานะการเชื่อมต่อ Supabase */}
       <div className="card-soft p-5">
         <div className="font-bold text-primary mb-2">☁️ การเชื่อมต่อฐานข้อมูล</div>
@@ -1002,6 +1006,58 @@ export function SettingsView({ isAdmin = false }: { isAdmin?: boolean }) {
 
       <DepartmentManager isAdmin={isAdmin} />
       <WardManager isAdmin={isAdmin} />
+    </div>
+  );
+}
+
+function ChangePasswordCard({ userId }: { userId: string }) {
+  const [current,  setCurrent]  = useState("");
+  const [next,     setNext]     = useState("");
+  const [confirm,  setConfirm]  = useState("");
+  const [showPw,   setShowPw]   = useState(false);
+
+  const submit = () => {
+    if (!current) return toast.error("กรุณากรอกรหัสผ่านปัจจุบัน");
+    if (next.length < 4) return toast.error("รหัสผ่านใหม่ต้องมีอย่างน้อย 4 ตัวอักษร");
+    if (next !== confirm) return toast.error("รหัสผ่านใหม่ไม่ตรงกัน");
+    const res = updateUser(userId, { password: next }, current);
+    if (!res.ok) return toast.error(res.error ?? "รหัสผ่านปัจจุบันไม่ถูกต้อง");
+    toast.success("เปลี่ยนรหัสผ่านเรียบร้อยแล้ว 🔒");
+    setCurrent(""); setNext(""); setConfirm("");
+  };
+
+  const inputCls = "w-full px-3 py-2 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-ring";
+  const type = showPw ? "text" : "password";
+
+  return (
+    <div className="card-soft p-5">
+      <div className="font-bold text-primary mb-4 flex items-center gap-2">
+        🔒 เปลี่ยนรหัสผ่าน
+      </div>
+      <div className="space-y-3 max-w-sm">
+        <div className="space-y-1">
+          <label className="text-xs font-semibold text-muted-foreground">รหัสผ่านปัจจุบัน</label>
+          <input type={type} value={current} onChange={(e) => setCurrent(e.target.value)} className={inputCls} placeholder="รหัสผ่านเดิม" />
+        </div>
+        <div className="space-y-1">
+          <label className="text-xs font-semibold text-muted-foreground">รหัสผ่านใหม่</label>
+          <input type={type} value={next} onChange={(e) => setNext(e.target.value)} className={inputCls} placeholder="อย่างน้อย 4 ตัวอักษร" />
+        </div>
+        <div className="space-y-1">
+          <label className="text-xs font-semibold text-muted-foreground">ยืนยันรหัสผ่านใหม่</label>
+          <input type={type} value={confirm} onChange={(e) => setConfirm(e.target.value)} className={inputCls} placeholder="พิมพ์รหัสผ่านใหม่อีกครั้ง"
+            onKeyDown={(e) => { if (e.key === "Enter") submit(); }} />
+        </div>
+        <div className="flex items-center gap-3 pt-1">
+          <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer select-none">
+            <input type="checkbox" checked={showPw} onChange={(e) => setShowPw(e.target.checked)} className="rounded" />
+            แสดงรหัสผ่าน
+          </label>
+          <button onClick={submit} className="ml-auto px-5 py-2 rounded-2xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-all">
+            บันทึก
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

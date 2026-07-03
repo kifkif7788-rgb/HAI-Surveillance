@@ -140,6 +140,7 @@ export function createUser(u: NewUser): Result {
 export function updateUser(
   id: string,
   patch: Partial<{ name: string; role: string; emoji: string; isAdmin: boolean; password: string }>,
+  currentPassword?: string, // required when a non-admin changes their own password
 ): Result {
   const users = readUsers();
   const u = users.find((x) => x.id === id);
@@ -151,6 +152,12 @@ export function updateUser(
 
   if (patch.password !== undefined && patch.password !== "" && patch.password.length < 4)
     return { ok: false, error: "รหัสผ่านต้องยาวอย่างน้อย 4 ตัวอักษร" };
+
+  // verify current password when provided (self-service password change)
+  if (patch.password && currentPassword !== undefined) {
+    if (u.passHash !== hash(currentPassword))
+      return { ok: false, error: "รหัสผ่านปัจจุบันไม่ถูกต้อง" };
+  }
 
   if (patch.name   !== undefined) u.name  = patch.name.trim() || u.name;
   if (patch.role   !== undefined) u.role  = patch.role.trim();
@@ -216,10 +223,10 @@ export interface NCodeAccount {
 
 /**
  * Create one account per ward using sequential N-code usernames (N1, N2, N3...).
- * Skips wards that already have any account. Returns the newly created accounts
- * (with plaintext password) so the admin can display/copy them.
+ * All accounts share the same defaultPassword ("1234"). Users can change it later.
+ * Skips wards that already have any account. Returns the newly created accounts.
  */
-export function generateNCodeAccounts(wards: string[]): NCodeAccount[] {
+export function generateNCodeAccounts(wards: string[], defaultPassword = "1234"): NCodeAccount[] {
   const users = readUsers();
 
   // wards that already have at least one non-admin account
@@ -235,10 +242,8 @@ export function generateNCodeAccounts(wards: string[]): NCodeAccount[] {
   const created: NCodeAccount[] = [];
 
   for (const ward of wards) {
-    if (haveWard.has(ward)) continue; // skip if ward already has an account
+    if (haveWard.has(ward)) continue;
     const username = `N${nextN++}`;
-    const pw = generatePassword();
-    const account: NCodeAccount = { username, name: ward, role: ward, password: pw };
     users.push({
       id: crypto.randomUUID(),
       username,
@@ -246,11 +251,11 @@ export function generateNCodeAccounts(wards: string[]): NCodeAccount[] {
       role: ward,
       emoji: "🧑‍⚕️",
       isAdmin: false,
-      passHash: hash(pw),
-      password: pw,
+      passHash: hash(defaultPassword),
+      password: defaultPassword,
     });
     haveWard.add(ward);
-    created.push(account);
+    created.push({ username, name: ward, role: ward, password: defaultPassword });
   }
 
   if (created.length > 0) writeUsers(users);

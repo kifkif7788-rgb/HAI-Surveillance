@@ -82,7 +82,7 @@ function Index() {
               : <AccessDenied />)}
             {view === "kpi" && <KPIView isAdmin={user.isAdmin} />}
             {view === "survey" && <SurveyView currentUser={{ id: user.id, name: user.name, role: user.role, isAdmin: user.isAdmin }} />}
-            {view === "settings" && <SettingsView isAdmin={user.isAdmin} />}
+            {view === "settings" && <SettingsView isAdmin={user.isAdmin} currentUserId={user.id} />}
             {view === "users" && (user.isAdmin
               ? <UsersView currentUserId={user.id} />
               : <AccessDenied />)}
