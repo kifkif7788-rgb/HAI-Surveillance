@@ -3,6 +3,7 @@ import { SITES, ssiWindowDays, type PatientRecord } from "@/lib/hai-types";
 import { daysBetween, evaluate, type RuleResult } from "@/lib/rule-engine";
 import { formatDateThai } from "@/components/ui/ThaiDatePicker";
 import { cn } from "@/lib/utils";
+import { BundleButton } from "@/components/BundleModal";
 
 const TONE: Record<RuleResult["tone"], { box: string; dot: string }> = {
   danger: { box: "bg-pink/50 text-pink-foreground border-pink-foreground/40",   dot: "bg-pink-foreground" },
@@ -146,6 +147,9 @@ export function PatientDetailDialog({ open, onOpenChange, record }: Props) {
                     <div className="min-w-0">
                       <div className="font-bold text-sm">{res.label}</div>
                       {res.detail && <div className="text-xs opacity-90 mt-0.5">{res.detail}</div>}
+                      {(res.tone === "danger" || res.tone === "warn") && (
+                        <BundleButton label={res.label} />
+                      )}
                     </div>
                   </div>
                 );

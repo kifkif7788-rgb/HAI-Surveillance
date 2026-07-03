@@ -1,6 +1,7 @@
 import { type PatientRecord } from "@/lib/hai-types";
 import { daysBetween, evaluate, type RuleResult } from "@/lib/rule-engine";
 import { cn } from "@/lib/utils";
+import { BundleButton } from "@/components/BundleModal";
 
 // Criteria per site for the reference section
 const CRITERIA: Record<string, { ref: string; groups: { label: string; color: string; items: string[] }[] }> = {
@@ -193,6 +194,9 @@ export function ResultSummaryPanel({ data }: { data: PatientRecord }) {
             <div key={i} className={cn("rounded-2xl p-3 border-2", TONE_STYLE[r.tone])}>
               <div className="font-bold text-sm">{r.label}</div>
               {r.detail && <div className="text-xs opacity-80 mt-0.5">{r.detail}</div>}
+              {(r.tone === "danger" || r.tone === "warn") && (
+                <BundleButton label={r.label} />
+              )}
             </div>
           ))}
         </div>
