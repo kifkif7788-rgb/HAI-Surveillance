@@ -9,8 +9,11 @@ import { ReportsView, SettingsView } from "@/components/views/SimpleViews";
 import { UsersView } from "@/components/views/UsersView";
 import { MonthlyDataView } from "@/components/views/MonthlyDataView";
 import { KPIView } from "@/components/views/KPIView";
+import { SurveyView } from "@/components/views/SurveyView";
 import { LoginView } from "@/components/views/LoginView";
 import { pullKPI } from "@/lib/kpi-store";
+import { pullSurveys } from "@/lib/survey-store";
+import { pullInterviews } from "@/lib/interview-store";
 import { OR_DEPTS, pullOrStats } from "@/lib/or-store";
 import { wardNames, syncWards } from "@/lib/ward-store";
 import { seedIfEmpty, migrateWards, pullRecords } from "@/lib/hai-store";
@@ -39,7 +42,7 @@ function Index() {
       // Pull from Supabase into the local cache first (no-op if not configured)
       await Promise.all([
         pullRecords(), pullMonthly(), pullOrStats(), pullUsers(),
-        syncWards(), pullKPI(),
+        syncWards(), pullKPI(), pullSurveys(), pullInterviews(),
       ]);
       if (cancelled) return;
       seedIfEmpty();         // seed only if still empty after pull
@@ -57,6 +60,7 @@ function Index() {
     dashboard: "Dashboard ภาพรวม",
     monthly: "ข้อมูลรายเดือน",
     kpi: "ตัวชี้วัดหลัก (KPI)",
+    survey: "แบบประเมินความพึงพอใจ",
     settings: "ตั้งค่าระบบ",
     users: "จัดการผู้ใช้",
   };
@@ -77,6 +81,7 @@ function Index() {
               ? <MonthlyDataView currentUser={{ isAdmin: user.isAdmin, ward: user.role }} />
               : <AccessDenied />)}
             {view === "kpi" && <KPIView isAdmin={user.isAdmin} />}
+            {view === "survey" && <SurveyView currentUser={{ id: user.id, name: user.name, role: user.role, isAdmin: user.isAdmin }} />}
             {view === "settings" && <SettingsView isAdmin={user.isAdmin} />}
             {view === "users" && (user.isAdmin
               ? <UsersView currentUserId={user.id} />

@@ -1,11 +1,11 @@
 import { createContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { Home, Users, FileBarChart, LayoutDashboard, Settings, UserCog, CalendarDays, LogOut, Target } from "lucide-react";
+import { Home, Users, FileBarChart, LayoutDashboard, Settings, UserCog, CalendarDays, LogOut, Target, ClipboardList } from "lucide-react";
 import mascot from "@/assets/mascot.png";
 import { OR_DEPTS } from "@/lib/or-store";
 import { wardNames } from "@/lib/ward-store";
 import { cn } from "@/lib/utils";
 
-export type ViewKey = "record" | "patients" | "reports" | "dashboard" | "monthly" | "kpi" | "settings" | "users";
+export type ViewKey = "record" | "patients" | "reports" | "dashboard" | "monthly" | "kpi" | "survey" | "settings" | "users";
 export const HeaderActionsContext = createContext<(node: ReactNode) => void>(() => {});
 
 /** Decide whether a user may see a nav item. */
@@ -22,6 +22,7 @@ const NAV: { key: ViewKey; label: string; icon: typeof Home }[] = [
   { key: "dashboard", label: "Dashboard",      icon: LayoutDashboard },
   { key: "monthly",   label: "ข้อมูลรายเดือน",  icon: CalendarDays },
   { key: "kpi",       label: "ตัวชี้วัด",       icon: Target },
+  { key: "survey",    label: "แบบประเมิน",      icon: ClipboardList },
   { key: "settings",  label: "ตั้งค่า",         icon: Settings },
   { key: "users",     label: "จัดการผู้ใช้",    icon: UserCog },
 ];
