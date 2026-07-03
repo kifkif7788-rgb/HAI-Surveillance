@@ -482,34 +482,39 @@ function SurveyForm({ currentUser }: { currentUser: { id: string; name: string; 
             </div>
           </div>
 
-          {/* Q3.2 เหตุผล */}
-          <div className="space-y-3">
-            <p className="text-sm font-semibold text-foreground">2. กรุณาระบุเหตุผลที่ท่านเลือกในข้อที่ 1</p>
+          {/* Q3.2 เหตุผล — แสดงเฉพาะระบบที่เลือก */}
+          {preferredSystem !== "" && (
             <div className="space-y-2">
-              <label className="text-xs font-medium text-sky-foreground">
-                💻 หากท่านเลือกระบบเว็บแอป กรุณาระบุเหตุผลสั้น ๆ:
-              </label>
-              <textarea
-                value={webappReason}
-                onChange={(e) => setWebappReason(e.target.value)}
-                rows={2}
-                placeholder="เหตุผลที่เลือกเว็บแอป..."
-                className={cn(inputCls, "resize-none")}
-              />
+              <p className="text-sm font-semibold text-foreground">2. กรุณาระบุเหตุผลที่ท่านเลือกในข้อที่ 1</p>
+              {preferredSystem === "webapp" ? (
+                <>
+                  <label className="text-xs font-medium text-sky-foreground">
+                    💻 หากท่านเลือกระบบเว็บแอป กรุณาระบุเหตุผลสั้น ๆ:
+                  </label>
+                  <textarea
+                    value={webappReason}
+                    onChange={(e) => setWebappReason(e.target.value)}
+                    rows={2}
+                    placeholder="เหตุผลที่เลือกเว็บแอป..."
+                    className={cn(inputCls, "resize-none")}
+                  />
+                </>
+              ) : (
+                <>
+                  <label className="text-xs font-medium text-muted-foreground">
+                    📄 หากท่านเลือกระบบแบบกระดาษ กรุณาระบุเหตุผลสั้น ๆ:
+                  </label>
+                  <textarea
+                    value={paperReason}
+                    onChange={(e) => setPaperReason(e.target.value)}
+                    rows={2}
+                    placeholder="เหตุผลที่เลือกกระดาษ..."
+                    className={cn(inputCls, "resize-none")}
+                  />
+                </>
+              )}
             </div>
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground">
-                📄 หากท่านเลือกระบบแบบกระดาษ กรุณาระบุเหตุผลสั้น ๆ:
-              </label>
-              <textarea
-                value={paperReason}
-                onChange={(e) => setPaperReason(e.target.value)}
-                rows={2}
-                placeholder="เหตุผลที่เลือกกระดาษ..."
-                className={cn(inputCls, "resize-none")}
-              />
-            </div>
-          </div>
+          )}
 
           {/* Q3.3 ปัจจัยสำคัญ */}
           <div className="space-y-2">
