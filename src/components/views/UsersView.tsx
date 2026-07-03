@@ -38,17 +38,6 @@ export function UsersView({ currentUserId }: { currentUserId: string }) {
         <div className="flex gap-2">
           <button
             onClick={() => {
-              const { created } = generateWardAccounts(wardNames());
-              if (created === 0) toast.info("ทุกแผนกมีบัญชีอยู่แล้ว");
-              else toast.success(`สร้างบัญชีรายแผนกใหม่ ${created} บัญชี`);
-            }}
-            className="btn-soft bg-mint text-mint-foreground gap-2 px-4 text-sm"
-            title="สร้างบัญชี 1 บัญชีต่อแผนกที่ยังไม่มี">
-            <Building2 className="w-4 h-4" />
-            สร้างบัญชีรายแผนก
-          </button>
-          <button
-            onClick={() => {
               const allWards = [...wardNames(), ...OR_DEPTS];
               const result = generateNCodeAccounts(allWards);
               if (result.length === 0) toast.info("ทุกแผนกมีบัญชีอยู่แล้ว");
