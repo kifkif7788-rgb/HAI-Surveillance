@@ -97,21 +97,54 @@ function initStates(): Record<string, QState> {
 
 /* ── TTS ── */
 let voicesLoaded = false;
+let thVoiceCache: SpeechSynthesisVoice | null = null;
+
+function getThaiVoice(): SpeechSynthesisVoice | null {
+  if (thVoiceCache) return thVoiceCache;
+  const voices = window.speechSynthesis.getVoices();
+  // prefer a neural/natural voice; fallback to any th-TH
+  thVoiceCache =
+    voices.find((v) => v.lang.startsWith("th") && /neural|natural|premium/i.test(v.name)) ??
+    voices.find((v) => v.lang === "th-TH") ??
+    voices.find((v) => v.lang.startsWith("th")) ??
+    null;
+  return thVoiceCache;
+}
+
+function makeUtterance(text: string, isLast: boolean, onEnd?: () => void): SpeechSynthesisUtterance {
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang  = "th-TH";
+  u.rate  = 0.80;   // ช้าลงเล็กน้อย — อ่านชัดขึ้น
+  u.pitch = 1.0;    // neutral pitch ฟังเป็นธรรมชาติกว่า 1.05
+  const v = getThaiVoice();
+  if (v) u.voice = v;
+  if (isLast && onEnd) u.onend = onEnd;
+  return u;
+}
+
 function speak(text: string, onEnd?: () => void) {
   if (typeof window === "undefined" || !window.speechSynthesis) return;
   window.speechSynthesis.cancel();
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = "th-TH";
-  utter.rate = 0.88;
-  utter.pitch = 1.05;
-  if (voicesLoaded) {
-    const thVoice = window.speechSynthesis.getVoices().find((v) => v.lang.startsWith("th"));
-    if (thVoice) utter.voice = thVoice;
-  }
-  if (onEnd) utter.onend = onEnd;
-  window.speechSynthesis.speak(utter);
+
+  // แบ่งที่จุดหยุดธรรมชาติ: จุลภาค, เครื่องหมายคำถาม, วงเล็บ, สแลช, ช่องว่าง 2+ ตัว
+  const raw = text.replace(/\s*\/\s*/g, " , "); // "/" → pause
+  const chunks = raw
+    .split(/,\s*|[/]\s*|\s{2,}/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 1);
+
+  if (chunks.length === 0) return;
+
+  chunks.forEach((chunk, i) => {
+    const u = makeUtterance(chunk, i === chunks.length - 1, onEnd);
+    window.speechSynthesis.speak(u);
+  });
 }
-function stopSpeech() { if (typeof window !== "undefined") window.speechSynthesis?.cancel(); }
+
+function stopSpeech() {
+  if (typeof window !== "undefined") window.speechSynthesis?.cancel();
+  thVoiceCache = null; // reset so next speak() re-picks the best voice
+}
 
 /* ── Props ── */
 interface Props {
@@ -169,7 +202,7 @@ function InterviewForm({ currentUser }: Props) {
   const timerRef    = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    const load = () => { voicesLoaded = true; };
+    const load = () => { voicesLoaded = true; thVoiceCache = null; }; // reset cache when voices reload
     window.speechSynthesis?.getVoices();
     window.speechSynthesis?.addEventListener("voiceschanged", load);
     return () => window.speechSynthesis?.removeEventListener("voiceschanged", load);
