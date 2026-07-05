@@ -6,7 +6,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  useUsers, createUser, updateUser, deleteUser, generateWardAccounts, generateNCodeAccounts,
+  useUsers, createUser, updateUser, deleteUser, generateNCodeAccounts,
   type User, type NCodeAccount,
 } from "@/lib/auth-store";
 import { useWardNames, wardNames } from "@/lib/ward-store";
@@ -22,6 +22,7 @@ export function UsersView({ currentUserId }: { currentUserId: string }) {
   const [toDelete, setToDelete]       = useState<User | null>(null);
   const [showLog, setShowLog]         = useState(false);
   const [nCodeResult, setNCodeResult] = useState<NCodeAccount[] | null>(null);
+  const [resetPw, setResetPw]         = useState<User | null>(null);
 
   const confirmDelete = () => {
     if (!toDelete) return;
@@ -86,6 +87,13 @@ export function UsersView({ currentUserId }: { currentUserId: string }) {
                   {u.isAdmin ? "แอดมิน" : "ผู้ใช้ทั่วไป"}
                 </span>
                 <div className="flex gap-1">
+                  <button
+                    onClick={() => setResetPw(u)}
+                    className="p-2 rounded-lg hover:bg-lemon/40 text-lemon-foreground"
+                    aria-label="รีเซ็ตรหัสผ่าน"
+                    title="เปลี่ยนรหัสผ่าน">
+                    🔑
+                  </button>
                   <button
                     onClick={() => setEditing(u)}
                     className="p-2 rounded-lg hover:bg-sky/30 text-sky-foreground"
@@ -184,6 +192,11 @@ export function UsersView({ currentUserId }: { currentUserId: string }) {
         </DialogContent>
       </Dialog>
 
+      {/* Reset password dialog */}
+      {resetPw && (
+        <ResetPasswordDialog user={resetPw} onClose={() => setResetPw(null)} />
+      )}
+
       {/* ประวัติการเข้าใช้งาน */}
       <div className="mt-5">
         <button
@@ -194,6 +207,55 @@ export function UsersView({ currentUserId }: { currentUserId: string }) {
         {showLog && <ActivityLogSection />}
       </div>
     </div>
+  );
+}
+
+function ResetPasswordDialog({ user, onClose }: { user: User; onClose: () => void }) {
+  const [pw, setPw]         = useState("");
+  const [showPw, setShowPw] = useState(false);
+
+  const save = () => {
+    if (pw.length < 4) { toast.error("รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร"); return; }
+    const res = updateUser(user.id, { password: pw }); // admin — no currentPassword needed
+    if (!res.ok) { toast.error(res.error); return; }
+    toast.success(`เปลี่ยนรหัสผ่านของ ${user.name} แล้ว 🔑`);
+    onClose();
+  };
+
+  return (
+    <Dialog open onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent className="sm:max-w-sm rounded-3xl">
+        <DialogHeader>
+          <div className="mx-auto text-4xl mb-1">🔑</div>
+          <DialogTitle className="text-center">เปลี่ยนรหัสผ่าน</DialogTitle>
+          <DialogDescription className="text-center">
+            <span className="font-semibold text-foreground">{user.name}</span> (@{user.username})
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3 px-1">
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-muted-foreground">รหัสผ่านใหม่</label>
+            <input
+              type={showPw ? "text" : "password"}
+              value={pw}
+              onChange={(e) => setPw(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") save(); }}
+              placeholder="อย่างน้อย 4 ตัวอักษร"
+              autoFocus
+              className={inputCls}
+            />
+          </div>
+          <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer select-none">
+            <input type="checkbox" checked={showPw} onChange={(e) => setShowPw(e.target.checked)} className="rounded" />
+            แสดงรหัสผ่าน
+          </label>
+        </div>
+        <DialogFooter className="gap-2 sm:gap-2 mt-2">
+          <button onClick={onClose} className="btn-soft bg-muted text-foreground flex-1 justify-center">ยกเลิก</button>
+          <button onClick={save} className="btn-soft bg-primary text-primary-foreground flex-1 justify-center">บันทึก</button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
