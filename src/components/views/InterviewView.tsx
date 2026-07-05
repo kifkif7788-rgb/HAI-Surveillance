@@ -218,7 +218,7 @@ function InterviewForm({ currentUser }: Props) {
   function handleSpeak(key: string, text: string, probe?: string) {
     if (speaking === key) { stopSpeech(); setSpeaking(null); return; }
     setSpeaking(key);
-    speak(probe ? `${text} คำถามต่อยอด: ${probe}` : text, () => setSpeaking(null));
+    speak(probe ? `${text} เช่น: ${probe}` : text, () => setSpeaking(null));
   }
 
   /* Recording */
@@ -377,7 +377,7 @@ function InterviewForm({ currentUser }: Props) {
                       </p>
                       {q.probe && (
                         <p className="text-xs text-muted-foreground mt-1 pl-5 border-l-2 border-muted ml-1">
-                          <span className="font-semibold">คำถามต่อยอด:</span> {q.probe}
+                          <span className="font-semibold">เช่น:</span> {q.probe}
                         </p>
                       )}
                     </div>
