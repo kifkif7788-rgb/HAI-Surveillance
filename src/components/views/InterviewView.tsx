@@ -475,8 +475,10 @@ function fmtDate(iso: string) {
   return `${d.getDate()} ${TH_MONTHS[d.getMonth()]} ${d.getFullYear() + 543} ${d.getHours().toString().padStart(2,"0")}:${d.getMinutes().toString().padStart(2,"0")}`;
 }
 
+const COLLECTION_START = new Date("2026-07-03T00:00:00+07:00").getTime(); // 3 ก.ค. 2569
+
 function InterviewResults() {
-  const sessions  = useInterviews();
+  const allSessions = useInterviews();
   const [sub, setSub]         = useState<"summary" | "sessions">("summary");
   const [syncing, setSyncing] = useState(false);
 
@@ -490,8 +492,21 @@ function InterviewResults() {
     toast.success("ซิงค์ข้อมูลล่าสุดแล้ว");
   };
 
+  // กรองเฉพาะข้อมูลตั้งแต่ 3 ก.ค. 2569 เป็นต้นไป
+  const sessions = allSessions.filter(
+    (s) => new Date(s.submittedAt).getTime() >= COLLECTION_START
+  );
+
   return (
     <div className="space-y-4">
+      {/* date range notice */}
+      <div className="text-xs text-muted-foreground bg-lemon/20 border border-lemon/40 rounded-xl px-3 py-2">
+        📅 แสดงข้อมูลตั้งแต่ <span className="font-semibold text-foreground">3 ก.ค. 2569</span> ถึงปัจจุบัน
+        {allSessions.length !== sessions.length && (
+          <span className="ml-2 text-muted-foreground">(ซ่อน {allSessions.length - sessions.length} รายการก่อนหน้า)</span>
+        )}
+      </div>
+
       {/* sub-tabs + refresh */}
       <div className="flex items-center gap-2 flex-wrap">
         <button

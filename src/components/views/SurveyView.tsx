@@ -625,8 +625,10 @@ function SurveyForm({ currentUser }: { currentUser: { id: string; name: string; 
 }
 
 /* ── Admin Results View ── */
+const COLLECTION_START = new Date("2026-07-03T00:00:00+07:00").getTime(); // 3 ก.ค. 2569
+
 function SurveyResults() {
-  const entries = useSurveys();
+  const allEntries = useSurveys();
   const [page, setPage]       = useState(1);
   const [syncing, setSyncing] = useState(false);
   const PER_PAGE = 5;
@@ -640,6 +642,11 @@ function SurveyResults() {
     setSyncing(false);
     toast.success("ซิงค์ข้อมูลล่าสุดแล้ว");
   };
+
+  // กรองเฉพาะข้อมูลตั้งแต่ 3 ก.ค. 2569 เป็นต้นไป
+  const entries = allEntries.filter(
+    (e) => new Date(e.submittedAt).getTime() >= COLLECTION_START
+  );
 
   const sorted = [...entries].sort((a, b) => b.submittedAt.localeCompare(a.submittedAt));
   const totalPages = Math.ceil(sorted.length / PER_PAGE);
@@ -680,7 +687,7 @@ function SurveyResults() {
         <div className="absolute -top-3.5 left-5 bg-mint text-mint-foreground rounded-full px-5 py-1 text-sm font-bold shadow-md">
           📊 สรุปผลการประเมิน
         </div>
-        <div className="pt-2 flex items-center justify-between gap-2 mb-4 flex-wrap">
+        <div className="pt-2 flex items-center justify-between gap-2 mb-3 flex-wrap">
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground text-sm">จำนวนผู้ตอบทั้งหมด:</span>
             <span className="font-bold text-lg text-foreground">{entries.length} คน</span>
@@ -691,6 +698,12 @@ function SurveyResults() {
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border border-border bg-white/80 text-muted-foreground hover:bg-muted/50 transition-all disabled:opacity-50">
             {syncing ? "⏳ กำลังซิงค์..." : "🔄 รีเฟรชข้อมูล"}
           </button>
+        </div>
+        <div className="mb-4 text-xs text-muted-foreground bg-lemon/20 border border-lemon/40 rounded-xl px-3 py-2">
+          📅 แสดงข้อมูลตั้งแต่ <span className="font-semibold text-foreground">3 ก.ค. 2569</span> ถึงปัจจุบัน
+          {allEntries.length !== entries.length && (
+            <span className="ml-2 text-muted-foreground">(ซ่อน {allEntries.length - entries.length} รายการก่อนหน้า)</span>
+          )}
         </div>
 
         {entries.length === 0 && (
