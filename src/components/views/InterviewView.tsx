@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import {
-  submitInterview, useInterviews, blobToBase64,
+  submitInterview, useInterviews, blobToBase64, pullInterviews,
   type InterviewSession, type InterviewAnswer,
 } from "@/lib/interview-store";
 import { cn } from "@/lib/utils";
@@ -477,12 +477,23 @@ function fmtDate(iso: string) {
 
 function InterviewResults() {
   const sessions  = useInterviews();
-  const [sub, setSub] = useState<"summary" | "sessions">("summary");
+  const [sub, setSub]         = useState<"summary" | "sessions">("summary");
+  const [syncing, setSyncing] = useState(false);
+
+  // pull latest from Supabase when this tab is opened
+  useEffect(() => { pullInterviews(); }, []);
+
+  const handleSync = async () => {
+    setSyncing(true);
+    await pullInterviews();
+    setSyncing(false);
+    toast.success("ซิงค์ข้อมูลล่าสุดแล้ว");
+  };
 
   return (
     <div className="space-y-4">
-      {/* sub-tabs */}
-      <div className="flex gap-2">
+      {/* sub-tabs + refresh */}
+      <div className="flex items-center gap-2 flex-wrap">
         <button
           onClick={() => setSub("summary")}
           className={cn("px-4 py-1.5 rounded-xl text-xs font-semibold transition-all border-2",
@@ -500,6 +511,12 @@ function InterviewResults() {
               : "bg-white/70 border-border text-muted-foreground hover:bg-muted/50"
           )}>
           👤 รายบุคคล ({sessions.length})
+        </button>
+        <button
+          onClick={handleSync}
+          disabled={syncing}
+          className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border border-border bg-white/80 text-muted-foreground hover:bg-muted/50 transition-all disabled:opacity-50">
+          {syncing ? "⏳ กำลังซิงค์..." : "🔄 รีเฟรชข้อมูล"}
         </button>
       </div>
 

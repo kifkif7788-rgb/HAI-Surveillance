@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import {
-  submitSurvey, useSurveys, emptyRatings,
+  submitSurvey, useSurveys, emptyRatings, pullSurveys,
   RATING_ITEMS, DECISION_FACTORS,
   type SurveyEntry, type RatingKey, type SystemChoice, type ReworkChoice, type RecommendChoice,
 } from "@/lib/survey-store";
+import { pullInterviews } from "@/lib/interview-store";
 import { InterviewView } from "./InterviewView";
 import { cn } from "@/lib/utils";
 
@@ -626,8 +627,19 @@ function SurveyForm({ currentUser }: { currentUser: { id: string; name: string; 
 /* ── Admin Results View ── */
 function SurveyResults() {
   const entries = useSurveys();
-  const [page, setPage] = useState(1);
+  const [page, setPage]       = useState(1);
+  const [syncing, setSyncing] = useState(false);
   const PER_PAGE = 5;
+
+  // pull latest from Supabase when this tab is opened
+  useEffect(() => { pullSurveys(); }, []);
+
+  const handleSync = async () => {
+    setSyncing(true);
+    await pullSurveys();
+    setSyncing(false);
+    toast.success("ซิงค์ข้อมูลล่าสุดแล้ว");
+  };
 
   const sorted = [...entries].sort((a, b) => b.submittedAt.localeCompare(a.submittedAt));
   const totalPages = Math.ceil(sorted.length / PER_PAGE);
@@ -668,9 +680,17 @@ function SurveyResults() {
         <div className="absolute -top-3.5 left-5 bg-mint text-mint-foreground rounded-full px-5 py-1 text-sm font-bold shadow-md">
           📊 สรุปผลการประเมิน
         </div>
-        <div className="pt-2 flex items-center gap-2 mb-4">
-          <span className="text-muted-foreground text-sm">จำนวนผู้ตอบทั้งหมด:</span>
-          <span className="font-bold text-lg text-foreground">{entries.length} คน</span>
+        <div className="pt-2 flex items-center justify-between gap-2 mb-4 flex-wrap">
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground text-sm">จำนวนผู้ตอบทั้งหมด:</span>
+            <span className="font-bold text-lg text-foreground">{entries.length} คน</span>
+          </div>
+          <button
+            onClick={handleSync}
+            disabled={syncing}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border border-border bg-white/80 text-muted-foreground hover:bg-muted/50 transition-all disabled:opacity-50">
+            {syncing ? "⏳ กำลังซิงค์..." : "🔄 รีเฟรชข้อมูล"}
+          </button>
         </div>
 
         {entries.length === 0 && (
