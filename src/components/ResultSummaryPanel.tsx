@@ -192,11 +192,17 @@ export function ResultSummaryPanel({ data }: { data: PatientRecord }) {
         <div className="space-y-2">
           {results.map((r, i) => (
             <div key={i} className={cn("rounded-2xl p-3 border-2", TONE_STYLE[r.tone])}>
-              <div className="font-bold text-sm">{r.label}</div>
-              {r.detail && <div className="text-xs opacity-80 mt-0.5">{r.detail}</div>}
-              {(r.tone === "danger" || r.tone === "warn") && (
-                <BundleButton label={r.label} />
-              )}
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="font-bold text-sm leading-snug">{r.label}</div>
+                  {r.detail && <div className="text-xs opacity-80 mt-0.5">{r.detail}</div>}
+                </div>
+                {(r.tone === "danger" || r.tone === "warn") && (
+                  <div className="shrink-0 mt-0.5">
+                    <BundleButton label={r.label} />
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>

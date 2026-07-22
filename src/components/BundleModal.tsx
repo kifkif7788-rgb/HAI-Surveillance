@@ -337,8 +337,8 @@ export function BundleButton({ label }: { label: string }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="mt-1.5 flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-dashed border-current/40 text-xs font-semibold hover:bg-white/30 transition-all">
-        🧩 Bundle การดูแล
+        className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-current/30 bg-white/20 text-[11px] font-semibold hover:bg-white/40 transition-all whitespace-nowrap">
+        🧩 Bundle
       </button>
       {open && <BundleModal label={label} onClose={() => setOpen(false)} />}
     </>

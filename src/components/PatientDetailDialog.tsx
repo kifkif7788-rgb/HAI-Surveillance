@@ -144,11 +144,15 @@ export function PatientDetailDialog({ open, onOpenChange, record }: Props) {
                 return (
                   <div key={i} className={cn("rounded-2xl px-3.5 py-3 border flex items-start gap-2.5", t.box)}>
                     <span className={cn("mt-1.5 w-2 h-2 rounded-full shrink-0", t.dot)} />
-                    <div className="min-w-0">
-                      <div className="font-bold text-sm">{res.label}</div>
-                      {res.detail && <div className="text-xs opacity-90 mt-0.5">{res.detail}</div>}
+                    <div className="flex-1 min-w-0 flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="font-bold text-sm leading-snug">{res.label}</div>
+                        {res.detail && <div className="text-xs opacity-90 mt-0.5">{res.detail}</div>}
+                      </div>
                       {(res.tone === "danger" || res.tone === "warn") && (
-                        <BundleButton label={res.label} />
+                        <div className="shrink-0 mt-0.5">
+                          <BundleButton label={res.label} />
+                        </div>
                       )}
                     </div>
                   </div>
