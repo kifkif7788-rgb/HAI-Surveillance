@@ -54,12 +54,10 @@ export function evaluate(p: PatientRecord): RuleResult[] {
     // CAUTI ต้องใส่สายสวนปัสสาวะ > 2 วัน; สายสวน ≤ 2 วัน หรือไม่ใส่ → จัดเป็น UTI ทั่วไป
     const cauti = !!p.uti_catheter && p.uti_catheter_ge2 === true;
     if (p.uti_candida) {
-      // พบ Candida ใน urine C/S → สรุปผล UTI/CAUTI ทันที (ไม่ต้องรอ symptom)
-      if (cauti && isHAI)  results.push({ label: "HAI / CAUTI", category: "HAI", tone: "danger", detail: "พบเชื้อ Candida ใน urine C/S (ใส่สายสวน > 2 วัน)" });
-      else if (isHAI)       results.push({ label: "HAI / UTI",   category: "HAI", tone: "danger", detail: "พบเชื้อ Candida ใน urine C/S" });
-      else if (cauti && isCI) results.push({ label: "CI / CAUTI", category: "CI",  tone: "ok",    detail: "พบเชื้อ Candida ใน urine C/S" });
-      else if (isCI)        results.push({ label: "CI / UTI",    category: "CI",  tone: "ok",    detail: "พบเชื้อ Candida ใน urine C/S" });
-      else results.push({ label: "HAI / UTI", category: "HAI", tone: "warn", detail: "พบเชื้อ Candida ใน urine C/S (กรุณากรอกวัน Admit/DOE)" });
+      // พบ Candida ใน urine C/S → HAI/UTI เสมอ (ไม่ขึ้นกับสายสวน, ไม่ต้องรอ symptom)
+      if (isHAI)   results.push({ label: "HAI / UTI", category: "HAI", tone: "danger", detail: "พบเชื้อ Candida ใน urine C/S" });
+      else if (isCI) results.push({ label: "CI / UTI",  category: "CI",  tone: "ok",    detail: "พบเชื้อ Candida ใน urine C/S" });
+      else           results.push({ label: "HAI / UTI", category: "HAI", tone: "warn",  detail: "พบเชื้อ Candida ใน urine C/S (กรุณากรอกวัน Admit/DOE)" });
     } else if (p.uti_culture_positive && hasSym) {
       if (cauti && isHAI) results.push({ label: "HAI / CAUTI", category: "HAI", tone: "danger", detail: "ติดเชื้อจากสายสวนปัสสาวะ (> 2 วัน)" });
       else if (!cauti && isHAI) results.push({ label: "HAI / UTI", category: "HAI", tone: "danger", detail: "ติดเชื้อระบบทางเดินปัสสาวะ" });
