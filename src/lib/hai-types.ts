@@ -27,7 +27,7 @@ export interface PatientRecord {
   // 10.2 UTI
   uti_catheter?: boolean | null;
   uti_catheter_ge2?: boolean; // ใส่สายสวนปัสสาวะ ≥ 2 วัน (เกณฑ์ CAUTI)
-  uti_culture?: "negative" | "positive" | "multi"; // ผล Urine C/S: ไม่พบเชื้อ / พบ ≥10⁵ ≤2ชนิด / พบ >2 ชนิด
+  uti_culture?: "negative" | "positive" | "multi" | "candida"; // ผล Urine C/S: ไม่พบเชื้อ / พบ ≥10⁵ ≤2ชนิด / พบ >2 ชนิด / พบ Candida
   uti_culture_positive?: boolean;
   uti_candida?: boolean;
   uti_symptoms?: number[];

@@ -55,12 +55,13 @@ export function UTIForm({ data, onChange }: { data: PatientRecord; onChange: Upd
       </Sub>
       <Sub title="10.2.3 ผลเพาะเชื้อปัสสาวะ (Urine C/S)">
         <Radio checked={data.uti_culture === "negative"} label="ไม่พบเชื้อแบคทีเรีย"
-          onChange={() => onChange({ uti_culture: "negative", uti_culture_positive: false })} />
-        <Radio checked={data.uti_culture === "positive" || (data.uti_culture === undefined && data.uti_culture_positive === true)} label="พบเชื้อก่อโรค ≥ 10⁵ CFU/mL และไม่เกิน 2 ชนิด"
-          onChange={() => onChange({ uti_culture: "positive", uti_culture_positive: true })} />
+          onChange={() => onChange({ uti_culture: "negative", uti_culture_positive: false, uti_candida: false })} />
+        <Radio checked={data.uti_culture === "positive" || (data.uti_culture === undefined && data.uti_culture_positive === true && !data.uti_candida)} label="พบเชื้อก่อโรค ≥ 10⁵ CFU/mL และไม่เกิน 2 ชนิด"
+          onChange={() => onChange({ uti_culture: "positive", uti_culture_positive: true, uti_candida: false })} />
         <Radio checked={data.uti_culture === "multi"} label="พบเชื้อมากกว่า 2 ชนิด"
-          onChange={() => onChange({ uti_culture: "multi", uti_culture_positive: false })} />
-        <CheckButton checked={!!data.uti_candida} label="พบเชื้อ Candida ใน urine C/S" onChange={() => onChange({ uti_candida: !data.uti_candida })} />
+          onChange={() => onChange({ uti_culture: "multi", uti_culture_positive: false, uti_candida: false })} />
+        <Radio checked={data.uti_culture === "candida" || (data.uti_culture === undefined && !!data.uti_candida)} label="พบเชื้อ Candida ใน urine C/S"
+          onChange={() => onChange({ uti_culture: "candida", uti_culture_positive: false, uti_candida: true })} />
       </Sub>
       <Sub title="10.2.4 อาการและอาการแสดง (เลือกอย่างน้อย 1 ข้อ)">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
