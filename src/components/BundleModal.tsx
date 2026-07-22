@@ -196,7 +196,7 @@ export function BundleModal({ label, onClose }: Props) {
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/50 backdrop-blur-sm"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
 
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[92vh] flex flex-col overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[80vh] flex flex-col overflow-hidden">
 
         {/* ── Header ── */}
         <div className="shrink-0 px-6 pt-5 pb-4 border-b border-border/30">
