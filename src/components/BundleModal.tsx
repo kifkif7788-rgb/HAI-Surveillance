@@ -236,7 +236,7 @@ export function BundleModal({ label, onClose }: Props) {
         </div>
 
         {/* ── Scrollable content ── */}
-        <div className="overflow-y-auto flex-1 px-5 py-4 space-y-6">
+        <div className="overflow-y-auto flex-1 min-h-0 px-5 py-4 space-y-6">
           {bundles.map((bundle, bi) => {
             const c = COLOR[bundle.color] ?? COLOR.mint;
             const doneCount = checked[bi]?.filter(Boolean).length ?? 0;
