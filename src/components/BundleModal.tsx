@@ -169,12 +169,10 @@ export function BundleModal({ label, onClose }: Props) {
   const keys = getBundleKeys(label);
   const bundles = keys.map((k) => BUNDLES[k]).filter(Boolean);
 
-  // one checked-state array per bundle
   const [checked, setChecked] = useState<boolean[][]>(
     () => bundles.map((b) => b.items.map(() => false))
   );
 
-  // close on Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     document.addEventListener("keydown", handler);
@@ -189,45 +187,79 @@ export function BundleModal({ label, onClose }: Props) {
 
   if (bundles.length === 0) return null;
 
+  const totalItems = bundles.reduce((s, b) => s + b.items.length, 0);
+  const totalDone  = checked.reduce((s, row) => s + row.filter(Boolean).length, 0);
+  const pct = totalItems ? Math.round((totalDone / totalItems) * 100) : 0;
+
   return (
-    /* backdrop */
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/50 backdrop-blur-sm"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
 
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[92vh] flex flex-col overflow-hidden">
 
-        {/* Modal header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border/40 shrink-0">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">{bundles[0].icon}</span>
-            <div>
-              <p className="font-bold text-primary text-base leading-tight">🧩 Bundle การดูแล</p>
-              <p className="text-xs text-muted-foreground">{label}</p>
+        {/* ── Header ── */}
+        <div className="shrink-0 px-6 pt-5 pb-4 border-b border-border/30">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="text-3xl shrink-0">{bundles[0].icon}</span>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-0.5">
+                  🧩 Bundle การดูแล
+                </p>
+                <p className="font-black text-primary text-lg leading-tight truncate">
+                  {bundles.map((b) => b.title).join(" + ")}
+                </p>
+                <p className="text-sm text-muted-foreground mt-0.5">{label}</p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="shrink-0 w-9 h-9 rounded-full bg-muted/60 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-all text-base font-bold">
+              ✕
+            </button>
+          </div>
+
+          {/* Progress bar */}
+          <div className="mt-4">
+            <div className="flex justify-between items-center mb-1.5">
+              <span className="text-xs font-semibold text-muted-foreground">ความคืบหน้า</span>
+              <span className="text-xs font-bold text-foreground">{totalDone}/{totalItems} รายการ ({pct}%)</span>
+            </div>
+            <div className="h-2.5 bg-muted/50 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-mint transition-all duration-300 rounded-full"
+                style={{ width: `${pct}%` }}
+              />
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-full bg-muted/60 hover:bg-muted flex items-center justify-center text-muted-foreground transition-all text-lg leading-none">
-            ✕
-          </button>
         </div>
 
-        {/* Scrollable content */}
-        <div className="overflow-y-auto flex-1 px-5 py-4 space-y-5">
+        {/* ── Scrollable content ── */}
+        <div className="overflow-y-auto flex-1 px-5 py-4 space-y-6">
           {bundles.map((bundle, bi) => {
             const c = COLOR[bundle.color] ?? COLOR.mint;
             const doneCount = checked[bi]?.filter(Boolean).length ?? 0;
             const total = bundle.items.length;
 
             return (
-              <div key={bi} className="space-y-2">
-                <div className={cn("rounded-2xl px-4 py-2 flex items-center justify-between", c.header)}>
-                  <span className="font-bold text-sm">{bundle.title}</span>
-                  <span className="text-xs font-medium opacity-90">{doneCount}/{total} ✓</span>
+              <div key={bi}>
+                {/* Section header */}
+                <div className={cn("rounded-2xl px-5 py-3 mb-3 flex items-center justify-between", c.header)}>
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{bundle.icon}</span>
+                    <span className="font-black text-base">{bundle.title}</span>
+                  </div>
+                  <span className={cn(
+                    "text-sm font-bold px-2.5 py-0.5 rounded-full",
+                    doneCount === total ? "bg-white/60" : "bg-black/10"
+                  )}>
+                    {doneCount}/{total}
+                  </span>
                 </div>
 
-                <div className="space-y-2">
+                {/* Items */}
+                <div className="space-y-2.5">
                   {bundle.items.map((item, ii) => {
                     const done = checked[bi]?.[ii] ?? false;
                     return (
@@ -236,23 +268,35 @@ export function BundleModal({ label, onClose }: Props) {
                         type="button"
                         onClick={() => toggle(bi, ii)}
                         className={cn(
-                          "w-full text-left flex items-start gap-3 px-4 py-3 rounded-2xl border-2 transition-all",
+                          "w-full text-left flex items-start gap-3 px-4 py-3.5 rounded-2xl border-2 transition-all",
                           done
-                            ? "bg-mint/20 border-mint-foreground/30 opacity-70"
-                            : cn("bg-white/80 hover:border-border/60 hover:bg-muted/20", c.item)
+                            ? "bg-mint/15 border-mint-foreground/25"
+                            : cn("bg-white hover:bg-muted/20 border-border/60 hover:border-border", c.item)
                         )}>
+                        {/* Checkbox circle */}
                         <span className={cn(
-                          "shrink-0 mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center text-xs font-black transition-all",
-                          done ? "bg-mint border-mint-foreground/50 text-mint-foreground" : cn("border-border/50 bg-white", c.check)
+                          "shrink-0 mt-0.5 w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-black transition-all",
+                          done
+                            ? "bg-mint border-mint text-white"
+                            : "border-border/60 bg-white/80"
                         )}>
-                          {done ? "✓" : ""}
+                          {done ? "✓" : <span className="text-[10px] text-muted-foreground font-bold">{ii + 1}</span>}
                         </span>
-                        <div className="flex-1 min-w-0">
-                          <p className={cn("text-sm font-medium leading-snug", done && "line-through text-muted-foreground")}>
+
+                        <div className="flex-1 min-w-0 space-y-1">
+                          <p className={cn(
+                            "text-sm font-semibold leading-snug",
+                            done ? "line-through text-muted-foreground" : "text-foreground"
+                          )}>
                             {item.text}
                           </p>
                           {item.detail && (
-                            <p className="text-xs text-muted-foreground mt-0.5">{item.detail}</p>
+                            <p className={cn(
+                              "text-xs leading-relaxed",
+                              done ? "text-muted-foreground/60" : "text-muted-foreground"
+                            )}>
+                              💡 {item.detail}
+                            </p>
                           )}
                         </div>
                       </button>
@@ -264,12 +308,16 @@ export function BundleModal({ label, onClose }: Props) {
           })}
         </div>
 
-        {/* Footer */}
-        <div className="px-5 py-3 border-t border-border/30 shrink-0 flex justify-between items-center">
-          <p className="text-xs text-muted-foreground">กดรายการเพื่อ ✓ เสร็จแล้ว</p>
+        {/* ── Footer ── */}
+        <div className="shrink-0 px-5 py-3.5 border-t border-border/30 flex justify-between items-center bg-muted/20">
+          <p className="text-xs text-muted-foreground">
+            {totalDone === totalItems && totalItems > 0
+              ? "✅ ครบทุกรายการแล้ว"
+              : "กดแต่ละรายการเพื่อทำเครื่องหมาย ✓"}
+          </p>
           <button
             onClick={onClose}
-            className="px-5 py-2 rounded-2xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-all">
+            className="px-6 py-2 rounded-2xl bg-primary text-primary-foreground text-sm font-bold hover:opacity-90 transition-all shadow-sm">
             ปิด
           </button>
         </div>
