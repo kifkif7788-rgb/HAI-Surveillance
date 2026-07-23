@@ -195,7 +195,7 @@ export function RecordView() {
         </div>
 
         {/* ── ค้นหา / แก้ไขผู้ป่วยที่มีอยู่ ── */}
-        <div className="card-soft px-4 py-3">
+        <div className="card-soft px-4 py-3 relative z-10">
           {isEditing ? (
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <div className="flex items-center gap-2 text-sm min-w-0">
