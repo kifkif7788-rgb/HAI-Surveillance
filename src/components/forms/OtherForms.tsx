@@ -327,20 +327,45 @@ export function SSIForm({ data, onChange }: { data: PatientRecord; onChange: Upd
           onChange={() => onChange({ ssi_type: "organ_space" })}
         />
         {data.ssi_type === "organ_space" && (
-          <div className="ml-6 mt-2">
-            <label className="block text-xs font-semibold text-foreground/70 mb-1">ระบุตำแหน่ง Organ/Space Site</label>
-            <select
-              value={data.ssi_organ_space_site ?? ""}
-              onChange={(e) => onChange({ ssi_organ_space_site: e.target.value || undefined })}
-              className={cn(
-                "w-full px-3 py-2 rounded-xl border border-border bg-white/80 text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring",
-                !data.ssi_organ_space_site && "text-muted-foreground/60"
-              )}>
-              <option value="">เลือกตำแหน่ง...</option>
-              {SSI_ORGAN_SPACE_SITES.map((s) => (
-                <option key={s} value={s} className="text-foreground">{s}</option>
+          <div className="ml-6 mt-3 space-y-3">
+            {/* เกณฑ์ข้อ 1-2 (ข้อมูล) */}
+            <div className="rounded-xl bg-lemon/20 border border-lemon-foreground/20 px-3 py-2.5 text-xs text-foreground/80 space-y-1">
+              <div className="font-semibold text-foreground/90 mb-1">เกณฑ์ Organ/Space SSI (ต้องครบทุกข้อ)</div>
+              <div>✅ <span className="font-medium">เกณฑ์ 1:</span> เกิดภายใน 30 หรือ 90 วันหลังผ่าตัด <span className="text-muted-foreground">(ตรวจสอบอัตโนมัติจากวันที่)</span></div>
+              <div>✅ <span className="font-medium">เกณฑ์ 2:</span> ติดเชื้อลึกกว่าผิวหนัง พังผืด หรือกล้ามเนื้อรอบแผลผ่าตัด</div>
+              <div className="font-medium mt-1">เกณฑ์ 3: มีลักษณะอย่างน้อย 1 ข้อต่อไปนี้ ⬇️</div>
+            </div>
+            {/* เกณฑ์ข้อ 3 checkboxes */}
+            <div className="space-y-1">
+              {[
+                "3.1 มีหนองออกจากท่อระบายที่ใส่ไว้ภายในอวัยวะหรือช่องโพรงในร่างกาย",
+                "3.2 แยกเชื้อได้จากของเหลวหรือเนื้อเยื่อจากอวัยวะหรือช่องโพรงในร่างกาย",
+                "3.3 พบฝี (Abscess) หรือหลักฐานการติดเชื้อ จากการตรวจโดยตรง / ผ่าตัดใหม่ / ตรวจเนื้อเยื่อ / ตรวจทางรังสีวิทยา",
+              ].map((label, i) => (
+                <Check
+                  key={i}
+                  checked={!!(data.ssi_os_criteria ?? []).includes(i + 1)}
+                  label={label}
+                  onChange={() => onChange({ ssi_os_criteria: toggle(data.ssi_os_criteria ?? [], i + 1) })}
+                />
               ))}
-            </select>
+            </div>
+            {/* ระบุตำแหน่ง */}
+            <div>
+              <label className="block text-xs font-semibold text-foreground/70 mb-1">ระบุตำแหน่ง Organ/Space Site</label>
+              <select
+                value={data.ssi_organ_space_site ?? ""}
+                onChange={(e) => onChange({ ssi_organ_space_site: e.target.value || undefined })}
+                className={cn(
+                  "w-full px-3 py-2 rounded-xl border border-border bg-white/80 text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring",
+                  !data.ssi_organ_space_site && "text-muted-foreground/60"
+                )}>
+                <option value="">เลือกตำแหน่ง...</option>
+                {SSI_ORGAN_SPACE_SITES.map((s) => (
+                  <option key={s} value={s} className="text-foreground">{s}</option>
+                ))}
+              </select>
+            </div>
           </div>
         )}
       </Sub>
