@@ -203,6 +203,28 @@ const SSI_WOUND = [
   { key: "DW",  label: "4. Dirty wound (DW)" },
 ] as const;
 
+const SSI_ORGAN_SPACE_SITES = [
+  "Osteomyelitis",
+  "Breast abscess or mastitis",
+  "Myocarditis or pericarditis",
+  "Disc space",
+  "Ear, mastoid",
+  "Endocarditis",
+  "GI tract",
+  "Intraabdominal, not specified",
+  "Intracranial, brain abscess or dura",
+  "Meningitis or ventriculitis",
+  "Oral cavity (mouth, tongue or gums)",
+  "Other infections of the male or female reproductive tract",
+  "Periprosthetic Joint Infection",
+  "Spinal abscess without meningitis",
+  "Sinusitis",
+  "Upper respiratory tract",
+  "Urinary system infection",
+  "Arterial or venous infection",
+  "Vaginal cuff",
+];
+
 export function SSIForm({ data, onChange }: { data: PatientRecord; onChange: Updater }) {
   // ข้อ 6 (ไม่มีลักษณะ) เลือกแล้วล้างข้อ 1-5 และในทางกลับกัน
   const toggleSign = (val: number) => {
@@ -283,6 +305,42 @@ export function SSIForm({ data, onChange }: { data: PatientRecord; onChange: Upd
             {gap < 0
               ? "⚠️ วันที่มีอาการก่อนวันผ่าตัด — โปรดตรวจสอบวันที่"
               : `ห่างจากวันผ่าตัด ${gap} วัน · ${inWindow ? `อยู่ในช่วงเฝ้าระวัง (≤ ${windowDays} วัน)` : `เกินช่วงเฝ้าระวัง (> ${windowDays} วัน)`}`}
+          </div>
+        )}
+      </Sub>
+
+      {/* 10.4.4 SSI type */}
+      <Sub title="10.4.4 ประเภทการติดเชื้อที่ตำแหน่งผ่าตัด (SSI Type)">
+        <Radio
+          checked={data.ssi_type === "superficial"}
+          label="Superficial Incisional SSI — ติดเชื้อที่ผิวหนังหรือเนื้อเยื่อใต้ผิวหนัง"
+          onChange={() => onChange({ ssi_type: "superficial", ssi_organ_space_site: undefined })}
+        />
+        <Radio
+          checked={data.ssi_type === "deep"}
+          label="Deep Incisional SSI — ติดเชื้อชั้นลึก (fascial layer / muscle)"
+          onChange={() => onChange({ ssi_type: "deep", ssi_organ_space_site: undefined })}
+        />
+        <Radio
+          checked={data.ssi_type === "organ_space"}
+          label="Organ/Space SSI — การติดเชื้อในอวัยวะหรือช่องโพรงภายในร่างกาย"
+          onChange={() => onChange({ ssi_type: "organ_space" })}
+        />
+        {data.ssi_type === "organ_space" && (
+          <div className="ml-6 mt-2">
+            <label className="block text-xs font-semibold text-foreground/70 mb-1">ระบุตำแหน่ง Organ/Space Site</label>
+            <select
+              value={data.ssi_organ_space_site ?? ""}
+              onChange={(e) => onChange({ ssi_organ_space_site: e.target.value || undefined })}
+              className={cn(
+                "w-full px-3 py-2 rounded-xl border border-border bg-white/80 text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring",
+                !data.ssi_organ_space_site && "text-muted-foreground/60"
+              )}>
+              <option value="">เลือกตำแหน่ง...</option>
+              {SSI_ORGAN_SPACE_SITES.map((s) => (
+                <option key={s} value={s} className="text-foreground">{s}</option>
+              ))}
+            </select>
           </div>
         )}
       </Sub>

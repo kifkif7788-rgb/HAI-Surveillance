@@ -48,6 +48,8 @@ export interface PatientRecord {
   ssi_signDate?: string;     // 10.4.2 วันที่มีอาการแสดงการติดเชื้อ
   ssi_in_window?: boolean;   // fallback (กรณีไม่ได้กรอกวันที่)
   ssi_symptoms?: number[];
+  ssi_type?: "superficial" | "deep" | "organ_space"; // 10.4.4 ประเภท SSI
+  ssi_organ_space_site?: string;                      // 10.4.4 ตำแหน่ง Organ/Space SSI
   // 10.5 GI
   gi_cdiff_status?: "no" | "yes";          // 10.5.1 ไม่มี / 10.5.2 มี C. difficile
   gi_pseudo?: boolean;                       // 10.5.3 Pseudomembranous colitis

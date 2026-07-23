@@ -145,7 +145,12 @@ export function evaluate(p: PatientRecord): RuleResult[] {
       : !!p.ssi_in_window;
     const hadSurgery = surgeryDates.length > 0 || !!p.ssi_surgery;
     if (hadSurgery && inWindow && hasSym) {
-      results.push({ label: "SSI", category: "HAI", tone: "warn", detail: `การติดเชื้อแผลผ่าตัด (ภายใน ${windowDays} วัน)` });
+      const ssiTypeLabel =
+        p.ssi_type === "superficial" ? "Superficial Incisional SSI" :
+        p.ssi_type === "deep"        ? "Deep Incisional SSI" :
+        p.ssi_type === "organ_space" ? `Organ/Space SSI${p.ssi_organ_space_site ? ` (${p.ssi_organ_space_site})` : ""}` :
+        "SSI";
+      results.push({ label: ssiTypeLabel, category: "HAI", tone: "warn", detail: `การติดเชื้อแผลผ่าตัด (ภายใน ${windowDays} วัน)` });
     } else {
       results.push({ label: "ไม่มีการติดเชื้อ SSI", category: "NONE", tone: "info", detail: "" });
     }
