@@ -75,11 +75,7 @@ function Index() {
             {view === "patients" && <PatientListView />}
             {view === "reports" && <ReportsView />}
             {view === "dashboard" && <DashboardView />}
-            {view === "monthly" && (user.isAdmin
-                || wardNames().includes(user.role)
-                || (OR_DEPTS as readonly string[]).includes(user.role)
-              ? <MonthlyDataView currentUser={{ isAdmin: user.isAdmin, ward: user.role }} />
-              : <AccessDenied />)}
+            {view === "monthly" && <MonthlyDataView currentUser={{ isAdmin: user.isAdmin, ward: user.role }} />}
             {view === "kpi" && <KPIView isAdmin={user.isAdmin} />}
             {view === "survey" && <SurveyView currentUser={{ id: user.id, name: user.name, role: user.role, isAdmin: user.isAdmin }} />}
             {view === "settings" && <SettingsView isAdmin={user.isAdmin} currentUserId={user.id} />}
