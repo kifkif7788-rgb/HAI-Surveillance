@@ -50,6 +50,8 @@ export interface PatientRecord {
   ssi_symptoms?: number[];
   ssi_type?: "superficial" | "deep" | "organ_space"; // 10.4.4 ประเภท SSI
   ssi_organ_space_site?: string;                      // 10.4.4 ตำแหน่ง Organ/Space SSI
+  ssi_sup_criteria?: number[];                        // 10.4.4 เกณฑ์ Superficial SSI ข้อ 3.1-3.4 (≥1)
+  ssi_deep_criteria?: number[];                       // 10.4.4 เกณฑ์ Deep Incisional SSI ข้อ 3.1-3.3 (≥1)
   ssi_os_criteria?: number[];                         // 10.4.4 เกณฑ์ O/S SSI ข้อ 3.1/3.2/3.3 (≥1)
   ssi_os_criterion4?: boolean;                        // 10.4.4 เกณฑ์ O/S SSI ข้อ 4 (เข้าเกณฑ์ site)
   // 10.5 GI

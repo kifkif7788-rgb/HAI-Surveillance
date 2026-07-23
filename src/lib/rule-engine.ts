@@ -135,12 +135,17 @@ export function evaluate(p: PatientRecord): RuleResult[] {
   // 10.4 SSI
   if (p.sites.includes("10.4")) {
     // ข้อ 6 = "ไม่มีลักษณะ..." ไม่นับเป็นอาการ; นับเฉพาะข้อ 1-5
-    const hasSym        = (p.ssi_symptoms ?? []).some((n) => n >= 1 && n <= 5);
-    const hasOsCriteria = (p.ssi_os_criteria ?? []).length >= 1;
-    const isOrganSpace  = p.ssi_type === "organ_space";
-    const criteriaOk    = isOrganSpace
-      ? (hasOsCriteria && !!p.ssi_os_criterion4)
-      : hasSym;
+    const hasSym          = (p.ssi_symptoms ?? []).some((n) => n >= 1 && n <= 5);
+    const hasSupCriteria  = (p.ssi_sup_criteria  ?? []).length >= 1;
+    const hasDeepCriteria = (p.ssi_deep_criteria ?? []).length >= 1;
+    const hasOsCriteria   = (p.ssi_os_criteria   ?? []).length >= 1;
+    const isSuperficial   = p.ssi_type === "superficial";
+    const isDeep          = p.ssi_type === "deep";
+    const isOrganSpace    = p.ssi_type === "organ_space";
+    const criteriaOk      = isOrganSpace  ? (hasOsCriteria && !!p.ssi_os_criterion4)
+                          : isSuperficial ? hasSupCriteria
+                          : isDeep        ? hasDeepCriteria
+                          : hasSym;
     // วันที่ผ่าตัด (รองรับหลายครั้ง + ข้อมูลเก่าช่องเดียว)
     const surgeryDates = [...(p.ssi_surgeryDates ?? []), ...(p.ssi_surgeryDate ? [p.ssi_surgeryDate] : [])].filter(Boolean);
     // ช่วงเฝ้าระวังตามชนิดผ่าตัด (30/90 วัน); อยู่ในช่วงถ้าวันที่มีอาการอยู่ภายใน window หลังการผ่าตัดครั้งใดครั้งหนึ่ง
