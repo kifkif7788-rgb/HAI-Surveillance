@@ -11,7 +11,7 @@ export const HeaderActionsContext = createContext<(node: ReactNode) => void>(() 
 /** Decide whether a user may see a nav item. */
 function canSee(key: ViewKey, user?: AppUser): boolean {
   if (key === "users")   return !!user?.isAdmin;
-  if (key === "monthly") return !!user?.isAdmin || (!!user && (wardNames().includes(user.role) || (OR_DEPTS as readonly string[]).includes(user.role)));
+  if (key === "monthly") return true;
   return true;
 }
 
