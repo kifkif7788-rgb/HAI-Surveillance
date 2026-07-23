@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Save, BarChart3 } from "lucide-react";
+import { Save, BarChart3, Search, X } from "lucide-react";
 import { PatientForm } from "../PatientForm";
 import { InfectionSiteSelector } from "../InfectionSiteSelector";
 import { RespiratoryForm } from "../forms/RespiratoryForm";
@@ -9,7 +9,7 @@ import { ResultSummaryPanel } from "../ResultSummaryPanel";
 import { HAIAlertDialog } from "../HAIAlertDialog";
 import { EvaluationResultDialog } from "../EvaluationResultDialog";
 import { HeaderActionsContext } from "../AppLayout";
-import { emptyRecord, loadDraft, saveDraft, saveRecord, clearDraft } from "@/lib/hai-store";
+import { emptyRecord, loadDraft, saveDraft, saveRecord, clearDraft, useRecords } from "@/lib/hai-store";
 import { evaluate, type RuleResult } from "@/lib/rule-engine";
 import { categorize } from "@/lib/hai-stats";
 import { SITES, type PatientRecord } from "@/lib/hai-types";
@@ -29,18 +29,48 @@ function haiSiteIds(r: PatientRecord): string[] {
 }
 
 export function RecordView() {
-  const [data, setData] = useState<PatientRecord>(() => loadDraft() ?? emptyRecord());
+  const [data, setData]         = useState<PatientRecord>(() => loadDraft() ?? emptyRecord());
   const update = (p: Partial<PatientRecord>) => setData((d) => ({ ...d, ...p }));
   const [haiAlert, setHaiAlert]     = useState<{ open: boolean; results: RuleResult[] }>({ open: false, results: [] });
   const [saveAlert, setSaveAlert]   = useState<{ open: boolean; results: RuleResult[]; record: PatientRecord | null }>({ open: false, results: [], record: null });
   const [evalOpen, setEvalOpen]     = useState(false);
   const lastSigRef = useRef<string>("");
 
-  // Auto-save draft
+  // ── ค้นหาผู้ป่วยเพื่อแก้ไข ──
+  const allRecords = useRecords();
+  const [searchQ, setSearchQ]       = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [isEditing, setIsEditing]   = useState(false);
+
+  const searchResults = searchQ.trim().length >= 1
+    ? allRecords.filter((r) => {
+        const q = searchQ.trim().toLowerCase();
+        const name = `${r.firstName} ${r.lastName}`.toLowerCase();
+        return r.hn.toLowerCase().includes(q) || name.includes(q);
+      }).slice(0, 8)
+    : [];
+
+  function loadExisting(rec: PatientRecord) {
+    setData(rec);
+    setIsEditing(true);
+    setSearchOpen(false);
+    setSearchQ("");
+    clearDraft();
+    toast.info(`โหลดข้อมูล ${rec.firstName} ${rec.lastName} (HN: ${rec.hn}) แล้ว`);
+  }
+
+  function resetToNew() {
+    setData(emptyRecord());
+    setIsEditing(false);
+    clearDraft();
+  }
+
+  // Auto-save draft (skip when editing an existing record)
   useEffect(() => {
+    if (isEditing) return;
     const t = setTimeout(() => saveDraft(data), 600);
     return () => clearTimeout(t);
-  }, [data]);
+  }, [data, isEditing]);
 
   // Auto-popup whenever the evaluation concludes any HAI infection
   useEffect(() => {
@@ -89,6 +119,7 @@ export function RecordView() {
     const { merged } = saveRecord(savedData);
     clearDraft();
     setData(emptyRecord());
+    setIsEditing(false);
     if (merged) {
       toast.success(`รวมข้อมูลสำเร็จ • HN ${data.hn} / AN ${data.an} มีบันทึกอยู่แล้ว — เพิ่มเฉพาะข้อมูลที่ต่างกัน`);
     } else {
@@ -161,6 +192,71 @@ export function RecordView() {
               สรุปผลการประเมิน
             </button>
           </div>
+        </div>
+
+        {/* ── ค้นหา / แก้ไขผู้ป่วยที่มีอยู่ ── */}
+        <div className="card-soft px-4 py-3">
+          {isEditing ? (
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-2 text-sm min-w-0">
+                <span className="text-lg shrink-0">✏️</span>
+                <span className="font-semibold text-lemon-foreground shrink-0">กำลังแก้ไข:</span>
+                <span className="font-medium truncate">{[data.firstName, data.lastName].filter(Boolean).join(" ") || "—"}</span>
+                <span className="text-muted-foreground shrink-0">HN: {data.hn || "—"}</span>
+              </div>
+              <button
+                onClick={resetToNew}
+                className="btn-soft text-xs gap-1.5 px-3 py-1.5 shrink-0">
+                <X className="w-3.5 h-3.5" />
+                สร้างบันทึกใหม่
+              </button>
+            </div>
+          ) : (
+            <div className="relative">
+              <div className="flex items-center gap-2 border border-border/60 rounded-xl px-3 py-2 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 transition-all bg-white">
+                <Search className="w-4 h-4 text-muted-foreground shrink-0" />
+                <input
+                  value={searchQ}
+                  onChange={(e) => { setSearchQ(e.target.value); setSearchOpen(true); }}
+                  onFocus={() => setSearchOpen(true)}
+                  onBlur={() => setTimeout(() => setSearchOpen(false), 150)}
+                  placeholder="ค้นหาชื่อหรือ HN เพื่อแก้ไขข้อมูลผู้ป่วย..."
+                  className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                />
+                {searchQ && (
+                  <button
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => { setSearchQ(""); setSearchOpen(false); }}
+                    className="text-muted-foreground hover:text-foreground transition-colors">
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+              {searchOpen && searchResults.length > 0 && (
+                <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-white rounded-2xl shadow-xl border border-border overflow-hidden">
+                  {searchResults.map((rec) => (
+                    <button
+                      key={rec.id}
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => loadExisting(rec)}
+                      className="w-full text-left px-4 py-2.5 hover:bg-sky/15 text-sm border-b last:border-0 border-border/30 transition-colors">
+                      <div className="font-semibold leading-snug">
+                        {[rec.firstName, rec.lastName].filter(Boolean).join(" ") || "ไม่มีชื่อ"}
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-0.5">
+                        HN: {rec.hn || "—"} · AN: {rec.an || "—"} · {rec.ward || "—"}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+              {searchOpen && searchQ.trim().length >= 1 && searchResults.length === 0 && (
+                <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-white rounded-2xl shadow-xl border border-border px-4 py-3 text-sm text-muted-foreground">
+                  ไม่พบผู้ป่วยที่ตรงกับ "{searchQ}"
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* ── Forms ── */}
