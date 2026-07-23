@@ -350,6 +350,12 @@ export function SSIForm({ data, onChange }: { data: PatientRecord; onChange: Upd
                 />
               ))}
             </div>
+            {/* เกณฑ์ข้อ 4 */}
+            <Check
+              checked={!!data.ssi_os_criterion4}
+              label="4. มีลักษณะเข้าเกณฑ์การวินิจฉัยการติดเชื้อในระบบอวัยวะ/ตำแหน่ง Site ที่เลือก อย่างน้อย 1 ข้อ"
+              onChange={() => onChange({ ssi_os_criterion4: !data.ssi_os_criterion4 })}
+            />
             {/* ระบุตำแหน่ง */}
             <div>
               <label className="block text-xs font-semibold text-foreground/70 mb-1">ระบุตำแหน่ง Organ/Space Site</label>

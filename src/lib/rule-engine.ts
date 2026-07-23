@@ -138,7 +138,9 @@ export function evaluate(p: PatientRecord): RuleResult[] {
     const hasSym        = (p.ssi_symptoms ?? []).some((n) => n >= 1 && n <= 5);
     const hasOsCriteria = (p.ssi_os_criteria ?? []).length >= 1;
     const isOrganSpace  = p.ssi_type === "organ_space";
-    const criteriaOk    = isOrganSpace ? hasOsCriteria : hasSym;
+    const criteriaOk    = isOrganSpace
+      ? (hasOsCriteria && !!p.ssi_os_criterion4)
+      : hasSym;
     // วันที่ผ่าตัด (รองรับหลายครั้ง + ข้อมูลเก่าช่องเดียว)
     const surgeryDates = [...(p.ssi_surgeryDates ?? []), ...(p.ssi_surgeryDate ? [p.ssi_surgeryDate] : [])].filter(Boolean);
     // ช่วงเฝ้าระวังตามชนิดผ่าตัด (30/90 วัน); อยู่ในช่วงถ้าวันที่มีอาการอยู่ภายใน window หลังการผ่าตัดครั้งใดครั้งหนึ่ง
