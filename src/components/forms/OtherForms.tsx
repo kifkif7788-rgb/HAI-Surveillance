@@ -387,154 +387,171 @@ export function SSIForm({ data, onChange }: { data: PatientRecord; onChange: Upd
   );
 }
 
-const GI_CLIN = [
-  "1. ไข้ อุณหภูมิ > 38°C", "2. คลื่นไส้", "3. อาเจียน", "4. ปวด", "5. กดเจ็บ",
-  "6. กลืนเจ็บ", "7. กลืนลำบาก", "8. ปวดท้อง", "9. ตัวเย็น อุณหภูมิ < 36°C", "10. ปวดศีรษะ",
+const GAST_SYM = [
+  "1. คลื่นไส้",
+  "2. ปวดท้อง หรืออาเจียน",
+  "3. ไข้ อุณหภูมิ > 38.0 องศาเซลเซียส",
+  "4. ปวดศีรษะ",
 ];
-const GI_PATHOGEN = [
-  "1. พบเชื้อก่อโรคจากสารน้ำที่ระบายออกมา",
-  "2. พบเชื้อก่อโรคจากเนื้อเยื่อด้วยการเพาะเชื้อหรือวิธีอื่นๆ",
-  "3. พบเชื้อจากการย้อมสีกรัม",
-  "4. พบเชื้อราจากการย้อมด้วย KOH",
-  "5. ตรวจพบ multinucleated giant cells",
-  "6. ตรวจพบเชื้อจากเลือด",
-  "7. มีภาพถ่ายรังสีที่ชี้ว่ามีการติดเชื้อที่ระบบทางเดินอาหาร",
-  "8. มีภาพถ่ายจากการส่องกล้องตรวจที่ชี้ว่ามีการติดเชื้อที่ระบบทางเดินอาหาร",
-  "9. แพทย์สั่งการรักษาการติดเชื้อที่ระบบทางเดินอาหารโดยไม่มีสาเหตุอื่น",
-  "10. เพาะเชื้อก่อโรคได้จากอุจจาระหรือจากการทำ Rectal swab หรือตรวจด้วยวิธีอื่น",
-  "11. พบเชื้อก่อโรคจากการตรวจด้วยกล้องจุลทรรศน์",
-  "12. ตรวจพบ IgM antibody ต่อเชื้อก่อโรคสูงถึงระดับที่ใช้วินิจฉัย 1 ครั้ง",
-  "13. ตรวจพบ IgG antibody ต่อเชื้อก่อโรค เพิ่มขึ้น 4 เท่าขึ้นไปในการตรวจครั้งที่ 2",
+const GAST_EVIDENCE = [
+  "2.1 เพาะเชื้อก่อโรคได้จากตัวอย่างที่เก็บโดย Rectal swab หรือจากของเหลว/สิ่งอื่น",
+  "2.2 พบเชื้อก่อโรคจากการตรวจด้วยกล้องจุลทรรศน์",
+  "2.3 ตรวจ IgM antibody ถึงระดับวินิจฉัย 1 ครั้ง หรือ IgG antibody เพิ่มขึ้น 4 เท่าในการตรวจครั้งที่สอง",
 ];
-const GI_NEC_CLIN = [
-  "1. ดูดได้น้ำดีจากกระเพาะอาหาร", "2. อาเจียน", "3. ท้องอืด",
-  "4. มีเลือดปนมากับอุจจาระแต่เห็นไม่ได้ด้วยตาเปล่า", "5. ตรวจพบ occult blood",
+const CDIFF_CRIT = [
+  "1. ตรวจพบ Clostridium difficile toxin ในอุจจาระ",
+  "2. ตรวจพบ Pseudomembranous colitis โดยลักษณะทางกายวิภาค หรือทางพยาธิวิทยา",
 ];
-const GI_NEC_XRAY = [
-  "1. pneumatosis intestinalis", "2. portal venous gas (hepatobiliary gas)",
-  "3. pneumoperitoneum", "4. ภาพรังสีไม่ชัดเจน แต่แพทย์สั่งการรักษาแบบ NEC",
+const NEC_CLIN = [
+  "1. ท้องอืด",
+  "2. อาเจียน",
+  "3. ท้องเสีย",
+  "4. มีเลือดออก หรือตรวจพบ occult blood",
 ];
-const GI_NEC_SURG = [
-  "1. extensive bowel necrosis ความยาวอย่างน้อย 2 ซม.",
-  "2. pneumatosis intestinalis",
-  "3. อื่นๆ (เข้าได้ทั้ง 2 ข้อข้างต้น)",
+const NEC_XRAY = [
+  "1. Pneumatosis intestinalis",
+  "2. Portal venous gas (hepatobiliary gas)",
+  "3. Pneumoperitoneum",
+  "4. ภาพรังสีไม่ชัดเจน แต่แพทย์วินิจฉัยและรักษาแบบ NEC",
+];
+const NEC_SURG = [
+  "2.1 Extensive bowel necrosis ความยาวอย่างน้อย 2 เซนติเมตร",
+  "2.2 Pneumatosis intestinalis",
+];
+const GI_TRACT_CRIT = [
+  "1. มีหลักฐานทางรังสีวิทยาหรือพยาธิวิทยาของการติดเชื้อในระบบทางเดินอาหาร",
+  "2. มีฝีหรือหลักฐานการติดเชื้อจากการตรวจโดยตรง / ผ่าตัด / ตรวจเนื้อเยื่อ / รังสีวิทยา",
+  "3. พบเชื้อก่อโรคจากของเหลว/เนื้อเยื่อในระบบทางเดินอาหาร (เพาะเชื้อหรือวิธีอื่น)",
 ];
 
 export function GIForm({ data, onChange }: { data: PatientRecord; onChange: Updater }) {
-  const noCdiff = data.gi_cdiff_status === "no";
-  const ageUnder1 = typeof data.age === "number" && data.age < 1;
+  const gi = data.gi_type;
+  const symCount  = (data.gi_gast_symptoms ?? []).length;
+  const evidCount = (data.gi_gast_evidence ?? []).length;
 
   return (
     <SiteCard title="10.5 การติดเชื้อระบบทางเดินอาหาร" emoji="🍽️" color="bg-mint text-mint-foreground">
-      {/* 10.5.1 / 10.5.2 C. difficile */}
-      <Sub title="10.5.1–10.5.2 การติดเชื้อ Clostridium difficile">
-        <Radio checked={data.gi_cdiff_status === "no"} label="10.5.1 ไม่มีการติดเชื้อ Clostridium difficile"
-          onChange={() => onChange({ gi_cdiff_status: "no" })} />
-        <Radio checked={data.gi_cdiff_status === "yes"} label="10.5.2 มีการติดเชื้อ Clostridium difficile"
-          onChange={() => onChange({ gi_cdiff_status: "yes" })} />
-      </Sub>
 
-      {/* 10.5.3 Pseudomembranous colitis */}
-      <Sub title="10.5.3 Pseudomembranous colitis">
-        <CheckButton checked={!!data.gi_pseudo}
-          label="มีการติดเชื้อ Pseudomembranous colitis (โดยลักษณะทางกายภาพ หรือทางพยาธิวิทยา)"
-          onChange={() => onChange({ gi_pseudo: !data.gi_pseudo })} />
-      </Sub>
-
-      {/* 10.5.4 appendicitis */}
-      <Sub title="10.5.4 การวินิจฉัย">
+      {/* Appendicitis */}
+      <Sub title="การวินิจฉัย Appendicitis">
         <CheckButton checked={!!data.gi_appendicitis}
-          label="แพทย์วินิจฉัย appendicitis (สรุป: ไม่มีการติดเชื้อระบบทางเดินอาหาร)"
+          label="แพทย์วินิจฉัย Appendicitis (สรุปผล: ไม่มีการติดเชื้อระบบทางเดินอาหาร)"
           onChange={() => onChange({ gi_appendicitis: !data.gi_appendicitis })} />
       </Sub>
 
-      {/* 10.5.5 — เฉพาะเส้นทางไม่มี C. difficile */}
-      {noCdiff && (
-        <Sub title="10.5.5 อาการและอาการแสดง (เลือกอย่างน้อย 1 ข้อ)">
-          <Radio checked={data.gi_evidence === "anatomical"}
-            label="10.5.5.1 มีฝี/หลักฐานทางกายวิภาคหรือพยาธิวิทยาของการติดเชื้อในระบบทางเดินอาหาร"
-            onChange={() => onChange({ gi_evidence: "anatomical" })} />
+      {!data.gi_appendicitis && (<>
 
-          <Radio checked={data.gi_evidence === "clinical"}
-            label="10.5.5.2 มีอาการ/อาการแสดงที่เข้ากับการติดเชื้อในอวัยวะนั้น อย่างน้อย 2 อาการ"
-            onChange={() => onChange({ gi_evidence: "clinical" })} />
-          {data.gi_evidence === "clinical" && (
-            <div className="pl-4 grid grid-cols-1 sm:grid-cols-2 gap-1">
-              {GI_CLIN.map((s, i) => (
-                <Check key={i} checked={!!data.gi_clinical_symptoms?.includes(i + 1)} label={s}
-                  onChange={() => onChange({ gi_clinical_symptoms: toggle(data.gi_clinical_symptoms, i + 1) })} />
-              ))}
+        {/* Type selector */}
+        <Sub title="ประเภทการติดเชื้อ">
+          <Radio checked={gi === "gastroenteritis"}
+            label="Gastroenteritis (ไม่รวมการติดเชื้อ C. difficile)"
+            onChange={() => onChange({ gi_type: "gastroenteritis" })} />
+          <Radio checked={gi === "cdiff_pseudo"}
+            label="การติดเชื้อ C. difficile หรือ Pseudomembranous colitis"
+            onChange={() => onChange({ gi_type: "cdiff_pseudo" })} />
+          <Radio checked={gi === "nec"}
+            label="Necrotizing enterocolitis (NEC)"
+            onChange={() => onChange({ gi_type: "nec" })} />
+          <Radio checked={gi === "gi_tract"}
+            label="การติดเชื้อระบบทางเดินอาหาร (ยกเว้น Gastroenteritis / Appendicitis / C. difficile)"
+            onChange={() => onChange({ gi_type: "gi_tract" })} />
+        </Sub>
+
+        {/* ─── Gastroenteritis ─── */}
+        {gi === "gastroenteritis" && (
+          <Sub title="เกณฑ์การวินิจฉัย Gastroenteritis (≥1 ข้อ)">
+            <Check
+              checked={!!data.gi_gast_crit1}
+              label="1. อุจจาระร่วง (อุจจาระเป็นน้ำ นานกว่า 12 ชั่วโมง) โดยไม่มีสาเหตุอื่น"
+              onChange={() => onChange({ gi_gast_crit1: !data.gi_gast_crit1 })}
+            />
+            <div className="mt-2 pt-2 border-t border-border/40">
+              <div className="text-xs font-semibold text-foreground/70 mb-1">
+                2. มีอาการ ≥ 2 ข้อต่อไปนี้ {symCount >= 2 ? <span className="text-mint-foreground">✓ ({symCount} ข้อ)</span> : <span className="text-muted-foreground">({symCount}/4)</span>}
+              </div>
+              <div className="space-y-1 mb-3">
+                {GAST_SYM.map((label, i) => (
+                  <Check key={i}
+                    checked={!!(data.gi_gast_symptoms ?? []).includes(i + 1)}
+                    label={label}
+                    onChange={() => onChange({ gi_gast_symptoms: toggle(data.gi_gast_symptoms ?? [], i + 1) })} />
+                ))}
+              </div>
+              <div className="text-xs font-semibold text-foreground/70 mb-1">
+                AND มีหลักฐานอย่างน้อย 1 ข้อต่อไปนี้ {evidCount >= 1 ? <span className="text-mint-foreground">✓</span> : ""}
+              </div>
+              <div className="space-y-1">
+                {GAST_EVIDENCE.map((label, i) => (
+                  <Check key={i}
+                    checked={!!(data.gi_gast_evidence ?? []).includes(i + 1)}
+                    label={label}
+                    onChange={() => onChange({ gi_gast_evidence: toggle(data.gi_gast_evidence ?? [], i + 1) })} />
+                ))}
+              </div>
             </div>
-          )}
+          </Sub>
+        )}
 
-          <Radio checked={data.gi_evidence === "none"} label="10.5.5.3 ไม่พบทั้ง 2 ข้อ"
-            onChange={() => onChange({ gi_evidence: "none" })} />
-        </Sub>
-      )}
-
-      {/* 10.5.5.4 — เมื่อเลือก 10.5.5.2 */}
-      {noCdiff && data.gi_evidence === "clinical" && (
-        <Sub title="10.5.5.4 ตรวจพบเชื้อ (อย่างน้อย 1 ข้อ)">
-          {GI_PATHOGEN.map((s, i) => (
-            <Check key={i} checked={!!data.gi_pathogen?.includes(i + 1)} label={s}
-              onChange={() => onChange({ gi_pathogen: toggle(data.gi_pathogen, i + 1) })} />
-          ))}
-        </Sub>
-      )}
-
-      {/* 10.5.5.5 — เมื่อเลือก 10.5.5.3 */}
-      {noCdiff && data.gi_evidence === "none" && (
-        <Sub title="10.5.5.5 อุจจาระร่วงเฉียบพลัน">
-          <CheckButton checked={!!data.gi_diarrhea_acute}
-            label="มีอุจจาระร่วงเฉียบพลัน (อุจจาระเป็นน้ำ นานกว่า 12 ชั่วโมง) โดยไม่พบสาเหตุอื่น"
-            onChange={() => onChange({ gi_diarrhea_acute: !data.gi_diarrhea_acute })} />
-        </Sub>
-      )}
-
-      {/* 10.5.6 NEC — เมื่อเลือก 10.5.5.3 และอายุ < 1 ปี */}
-      {noCdiff && data.gi_evidence === "none" && ageUnder1 && (
-        <Sub title="10.5.6 ลักษณะ NEC (ต้องมีทั้ง 10.5.6.1 และ 10.5.6.2)">
-          <div className="text-sm font-semibold text-foreground/70">10.5.6.1 ลักษณะทางคลินิก (อย่างน้อย 1 ข้อ)</div>
-          <div className="pl-4 grid grid-cols-1 sm:grid-cols-2 gap-1">
-            {GI_NEC_CLIN.map((s, i) => (
-              <Check key={i} checked={!!data.gi_nec_clinical?.includes(i + 1)} label={s}
-                onChange={() => onChange({ gi_nec_clinical: toggle(data.gi_nec_clinical, i + 1) })} />
+        {/* ─── C. difficile / Pseudomembranous colitis ─── */}
+        {gi === "cdiff_pseudo" && (
+          <Sub title="เกณฑ์การวินิจฉัย C. difficile / Pseudomembranous colitis (≥1 ข้อ)">
+            {CDIFF_CRIT.map((label, i) => (
+              <Check key={i}
+                checked={!!(data.gi_cdiff_criteria ?? []).includes(i + 1)}
+                label={label}
+                onChange={() => onChange({ gi_cdiff_criteria: toggle(data.gi_cdiff_criteria ?? [], i + 1) })} />
             ))}
-          </div>
+          </Sub>
+        )}
 
-          <div className="text-sm font-semibold text-foreground/70 mt-2">10.5.6.2 ลักษณะภาพทางรังสี</div>
-          <Radio checked={data.gi_nec_xray === "has"} label="10.5.6.2 มีลักษณะภาพทางรังสี (อย่างน้อย 1 ข้อ)"
-            onChange={() => onChange({ gi_nec_xray: "has" })} />
-          {data.gi_nec_xray === "has" && (
-            <div className="pl-4 space-y-1">
-              {GI_NEC_XRAY.map((s, i) => (
-                <Check key={i} checked={!!data.gi_nec_xray_items?.includes(i + 1)} label={s}
-                  onChange={() => onChange({ gi_nec_xray_items: toggle(data.gi_nec_xray_items, i + 1) })} />
+        {/* ─── NEC ─── */}
+        {gi === "nec" && (
+          <Sub title="เกณฑ์การวินิจฉัย Necrotizing Enterocolitis (NEC)">
+            <div className="text-xs font-semibold text-foreground/70 mb-1">เกณฑ์ข้อ 1 — ลักษณะทางคลินิก (≥1 ข้อ)</div>
+            <div className="space-y-1 mb-3">
+              {NEC_CLIN.map((label, i) => (
+                <Check key={i}
+                  checked={!!(data.gi_nec_clinical ?? []).includes(i + 1)}
+                  label={label}
+                  onChange={() => onChange({ gi_nec_clinical: toggle(data.gi_nec_clinical ?? [], i + 1) })} />
               ))}
             </div>
-          )}
-          <Radio checked={data.gi_nec_xray === "none"} label="10.5.6.3 ไม่มีลักษณะที่กล่าวมา"
-            onChange={() => onChange({ gi_nec_xray: "none" })} />
-        </Sub>
-      )}
-
-      {/* 10.5.7 / 10.5.8 Surgical NEC — เมื่อเลือก 10.5.6.3 */}
-      {noCdiff && data.gi_evidence === "none" && ageUnder1 && data.gi_nec_xray === "none" && (
-        <Sub title="10.5.7–10.5.8 Surgical NEC (สิ่งตรวจพบระหว่างผ่าตัด)">
-          <Radio checked={data.gi_nec_surgical === "found"} label="10.5.7 มีสิ่งตรวจพบในระหว่างผ่าตัด"
-            onChange={() => onChange({ gi_nec_surgical: "found" })} />
-          {data.gi_nec_surgical === "found" && (
-            <div className="pl-4 space-y-1">
-              {GI_NEC_SURG.map((s, i) => (
-                <Check key={i} checked={!!data.gi_nec_surgical_items?.includes(i + 1)} label={s}
-                  onChange={() => onChange({ gi_nec_surgical_items: toggle(data.gi_nec_surgical_items, i + 1) })} />
+            <div className="text-xs font-semibold text-foreground/70 mb-1">เกณฑ์ข้อ 1 — ลักษณะทางภาพรังสี (≥1 ข้อ)</div>
+            <div className="space-y-1 mb-3">
+              {NEC_XRAY.map((label, i) => (
+                <Check key={i}
+                  checked={!!(data.gi_nec_xray_items ?? []).includes(i + 1)}
+                  label={label}
+                  onChange={() => onChange({ gi_nec_xray_items: toggle(data.gi_nec_xray_items ?? [], i + 1) })} />
               ))}
             </div>
-          )}
-          <Radio checked={data.gi_nec_surgical === "notfound"} label="10.5.8 ไม่มีสิ่งตรวจพบในระหว่างผ่าตัด"
-            onChange={() => onChange({ gi_nec_surgical: "notfound" })} />
-        </Sub>
-      )}
+            <div className="pt-2 border-t border-border/40">
+              <div className="text-xs font-semibold text-foreground/70 mb-1">เกณฑ์ข้อ 2 — Surgical NEC (≥1 ข้อ)</div>
+              <div className="space-y-1">
+                {NEC_SURG.map((label, i) => (
+                  <Check key={i}
+                    checked={!!(data.gi_nec_surgical_items ?? []).includes(i + 1)}
+                    label={label}
+                    onChange={() => onChange({ gi_nec_surgical_items: toggle(data.gi_nec_surgical_items ?? [], i + 1) })} />
+                ))}
+              </div>
+            </div>
+          </Sub>
+        )}
+
+        {/* ─── GI tract infection ─── */}
+        {gi === "gi_tract" && (
+          <Sub title="เกณฑ์การวินิจฉัยการติดเชื้อระบบทางเดินอาหาร (≥1 ข้อ)">
+            {GI_TRACT_CRIT.map((label, i) => (
+              <Check key={i}
+                checked={!!(data.gi_tract_criteria ?? []).includes(i + 1)}
+                label={label}
+                onChange={() => onChange({ gi_tract_criteria: toggle(data.gi_tract_criteria ?? [], i + 1) })} />
+            ))}
+          </Sub>
+        )}
+
+      </>)}
     </SiteCard>
   );
 }

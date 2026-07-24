@@ -171,36 +171,56 @@ export function evaluate(p: PatientRecord): RuleResult[] {
     const giNone = (detail: string): RuleResult => ({ label: "ไม่มีการติดเชื้อระบบทางเดินอาหาร", category: "NONE", tone: "info", detail });
 
     if (p.gi_appendicitis) {
-      // 10.5.4 appendicitis → ไม่ใช่การติดเชื้อทางเดินอาหาร
       results.push(giNone("วินิจฉัย appendicitis"));
     } else {
-      const cdiff  = p.gi_cdiff_status === "yes";                 // 10.5.2
-      const pseudo = !!p.gi_pseudo;                               // 10.5.3
-      const noCdiff = p.gi_cdiff_status === "no";
-      // 10.5.5 (เฉพาะเส้นทางไม่มี C. difficile)
-      const anatomical = noCdiff && p.gi_evidence === "anatomical"; // 10.5.5.1
-      const clinical   = noCdiff && p.gi_evidence === "clinical"     // 10.5.5.2 + 10.5.5.4
-        && (p.gi_clinical_symptoms?.length ?? 0) >= 2 && (p.gi_pathogen?.length ?? 0) >= 1;
+      let infected = false;
+      let variant = "";
 
-      // เส้นทาง 10.5.5.3 → 10.5.5.5 / 10.5.6
-      let acuteDiarrhea = false, nec = false;
-      if (noCdiff && p.gi_evidence === "none") {
-        acuteDiarrhea = !!p.gi_diarrhea_acute;                      // 10.5.5.5
-        const age = typeof p.age === "number" ? p.age : 99;
-        if (age < 1) {                                              // 10.5.6 NEC
-          const necClin = (p.gi_nec_clinical?.length ?? 0) >= 1;    // 10.5.6.1
-          const necXray = p.gi_nec_xray === "has" && (p.gi_nec_xray_items?.length ?? 0) >= 1; // 10.5.6.2
-          const surgical = p.gi_nec_xray === "none" && p.gi_nec_surgical === "found"           // 10.5.7
-            && (p.gi_nec_surgical_items?.length ?? 0) >= 1;
-          nec = necClin && (necXray || surgical);
+      if (p.gi_type === "gastroenteritis") {
+        const crit1 = !!p.gi_gast_crit1;
+        const crit2 = (p.gi_gast_symptoms?.length ?? 0) >= 2 && (p.gi_gast_evidence?.length ?? 0) >= 1;
+        infected = crit1 || crit2;
+        variant = " (Gastroenteritis)";
+      } else if (p.gi_type === "cdiff_pseudo") {
+        infected = (p.gi_cdiff_criteria?.length ?? 0) >= 1;
+        const hasPseudo = (p.gi_cdiff_criteria ?? []).includes(2);
+        variant = hasPseudo ? " (Pseudomembranous colitis)" : " (C. difficile)";
+      } else if (p.gi_type === "nec") {
+        const necClin = (p.gi_nec_clinical?.length ?? 0) >= 1;
+        const necXray = (p.gi_nec_xray_items?.length ?? 0) >= 1;
+        const necSurg = (p.gi_nec_surgical_items?.length ?? 0) >= 1;
+        infected = (necClin && necXray) || necSurg;
+        variant = " (NEC)";
+      } else if (p.gi_type === "gi_tract") {
+        infected = (p.gi_tract_criteria?.length ?? 0) >= 1;
+        variant = "";
+      } else {
+        // Backward compat with legacy fields
+        const cdiff    = p.gi_cdiff_status === "yes";
+        const pseudo   = !!p.gi_pseudo;
+        const noCdiff  = p.gi_cdiff_status === "no";
+        const anatomical = noCdiff && p.gi_evidence === "anatomical";
+        const clinical   = noCdiff && p.gi_evidence === "clinical"
+          && (p.gi_clinical_symptoms?.length ?? 0) >= 2 && (p.gi_pathogen?.length ?? 0) >= 1;
+        let acuteDiarrhea = false, nec = false;
+        if (noCdiff && p.gi_evidence === "none") {
+          acuteDiarrhea = !!p.gi_diarrhea_acute;
+          const age = typeof p.age === "number" ? p.age : 99;
+          if (age < 1) {
+            const necClin = (p.gi_nec_clinical?.length ?? 0) >= 1;
+            const necXray = p.gi_nec_xray === "has" && (p.gi_nec_xray_items?.length ?? 0) >= 1;
+            const surgical = p.gi_nec_xray === "none" && p.gi_nec_surgical === "found"
+              && (p.gi_nec_surgical_items?.length ?? 0) >= 1;
+            nec = necClin && (necXray || surgical);
+          }
         }
+        infected = cdiff || pseudo || anatomical || clinical || acuteDiarrhea || nec;
+        variant = cdiff ? " (C. difficile)" : pseudo ? " (Pseudomembranous colitis)" : nec ? " (NEC)" : "";
       }
 
-      const infected = cdiff || pseudo || anatomical || clinical || acuteDiarrhea || nec;
       if (infected) {
-        const variant = cdiff ? "(C. difficile)" : pseudo ? "(Pseudomembranous colitis)" : nec ? "(NEC)" : "";
         if (isHAI) results.push({ label: `HAI / GI${variant}`, category: "HAI", tone: "danger", detail: "ติดเชื้อระบบทางเดินอาหาร" });
-        else if (isCI) results.push({ label: "CI / GI", category: "CI", tone: "ok", detail: "" });
+        else if (isCI) results.push({ label: `CI / GI${variant}`, category: "CI", tone: "ok", detail: "" });
         else results.push({ label: `GI${variant}`, category: "HAI", tone: "warn", detail: "กรุณากรอกวัน Admit/DOE เพื่อจำแนก HAI/CI" });
       } else {
         results.push(giNone("ไม่เข้าเกณฑ์การติดเชื้อระบบทางเดินอาหาร"));

@@ -54,21 +54,30 @@ export interface PatientRecord {
   ssi_deep_criteria?: number[];                       // 10.4.4 เกณฑ์ Deep Incisional SSI ข้อ 3.1-3.3 (≥1)
   ssi_os_criteria?: number[];                         // 10.4.4 เกณฑ์ O/S SSI ข้อ 3.1/3.2/3.3 (≥1)
   ssi_os_criterion4?: boolean;                        // 10.4.4 เกณฑ์ O/S SSI ข้อ 4 (เข้าเกณฑ์ site)
-  // 10.5 GI
-  gi_cdiff_status?: "no" | "yes";          // 10.5.1 ไม่มี / 10.5.2 มี C. difficile
-  gi_pseudo?: boolean;                       // 10.5.3 Pseudomembranous colitis
-  gi_appendicitis?: boolean;                // 10.5.4 appendicitis (สรุป: ไม่ติดเชื้อ)
-  gi_evidence?: "anatomical" | "clinical" | "none"; // 10.5.5.1 / 10.5.5.2 / 10.5.5.3
-  gi_clinical_symptoms?: number[];          // 10.5.5.2 อาการที่เข้ากับการติดเชื้อ (≥ 2)
-  gi_pathogen?: number[];                    // 10.5.5.4 ตรวจพบเชื้อ (≥ 1)
-  // เส้นทางจาก 10.5.5.3 (ไม่พบทั้ง 2 ข้อ)
-  gi_diarrhea_acute?: boolean;              // 10.5.5.5 อุจจาระร่วงเฉียบพลัน > 12 ชม.
-  // 10.5.6 NEC (อายุ < 1 ปี — ต้องมีทั้ง 10.5.6.1 และ 10.5.6.2)
-  gi_nec_clinical?: number[];               // 10.5.6.1 ลักษณะทางคลินิก (≥ 1)
-  gi_nec_xray?: "has" | "none";             // 10.5.6.2 มีภาพรังสี / 10.5.6.3 ไม่มี
-  gi_nec_xray_items?: number[];             // 10.5.6.2 ลักษณะภาพทางรังสี (≥ 1)
-  gi_nec_surgical?: "found" | "notfound";   // 10.5.7 พบระหว่างผ่าตัด / 10.5.8 ไม่พบ
-  gi_nec_surgical_items?: number[];         // 10.5.7 สิ่งตรวจพบระหว่างผ่าตัด
+  // 10.5 GI (new structured fields)
+  gi_type?: "gastroenteritis" | "cdiff_pseudo" | "nec" | "gi_tract"; // ประเภท GI
+  gi_appendicitis?: boolean;                // appendicitis → ไม่ติดเชื้อ GI
+  // Gastroenteritis
+  gi_gast_crit1?: boolean;                  // เกณฑ์ 1: อุจจาระร่วง ≥12h
+  gi_gast_symptoms?: number[];              // เกณฑ์ 2 อาการ ≥2: 1=คลื่นไส้, 2=ปวดท้อง/อาเจียน, 3=ไข้>38°C, 4=ปวดศีรษะ
+  gi_gast_evidence?: number[];              // เกณฑ์ 2 หลักฐาน ≥1: 1=เพาะเชื้อ, 2=กล้อง, 3=antibody
+  // C. difficile / Pseudomembranous colitis
+  gi_cdiff_criteria?: number[];             // 1=ตรวจพบ toxin, 2=ตรวจพบ pseudomembranous
+  // NEC
+  gi_nec_clinical?: number[];               // คลินิก ≥1: 1=ท้องอืด, 2=อาเจียน, 3=ท้องเสีย, 4=เลือดออก/occult blood
+  gi_nec_xray_items?: number[];             // ภาพรังสี ≥1: 1=pneumatosis, 2=portal venous gas, 3=pneumoperitoneum, 4=แพทย์วินิจฉัย NEC
+  gi_nec_surgical_items?: number[];         // Surgical NEC ≥1: 1=extensive necrosis ≥2cm, 2=pneumatosis intestinalis
+  // GI tract infection
+  gi_tract_criteria?: number[];             // ≥1: 1=รังสี/พยาธิ, 2=ฝี/หลักฐาน, 3=เพาะเชื้อ/กล้อง
+  // Legacy fields (backward compat)
+  gi_cdiff_status?: "no" | "yes";
+  gi_pseudo?: boolean;
+  gi_evidence?: "anatomical" | "clinical" | "none";
+  gi_clinical_symptoms?: number[];
+  gi_pathogen?: number[];
+  gi_diarrhea_acute?: boolean;
+  gi_nec_xray?: "has" | "none";
+  gi_nec_surgical?: "found" | "notfound";
   createdAt: string;
   status: "draft" | "saved";
   result?: string;
