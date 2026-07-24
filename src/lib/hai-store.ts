@@ -126,8 +126,8 @@ function mergeRecords(existing: PatientRecord, incoming: PatientRecord): Patient
   };
 }
 
-/** Save a record. If an existing record with the same HN+AN already exists,
- *  merge rather than duplicate. Returns whether a merge occurred. */
+/** Save a record. Merges only if same HN+AN+DOE (same infection event).
+ *  Different DOE = new separate record for the same patient. */
 export function saveRecord(r: PatientRecord): { merged: boolean } {
   const all = read();
   const sameIdx = all.findIndex((x) => x.id === r.id);
@@ -140,11 +140,16 @@ export function saveRecord(r: PatientRecord): { merged: boolean } {
     return { merged: false };
   }
 
-  // check for duplicate HN+AN (case-insensitive trim)
-  const hn = r.hn.trim().toLowerCase();
-  const an = r.an.trim().toLowerCase();
-  const dupIdx = hn && an
-    ? all.findIndex((x) => x.hn.trim().toLowerCase() === hn && x.an.trim().toLowerCase() === an)
+  // check for duplicate HN+AN+DOE (case-insensitive trim) — same infection event
+  const hn  = r.hn.trim().toLowerCase();
+  const an  = r.an.trim().toLowerCase();
+  const doe = r.doeDate?.trim() ?? "";
+  const dupIdx = hn && an && doe
+    ? all.findIndex((x) =>
+        x.hn.trim().toLowerCase() === hn &&
+        x.an.trim().toLowerCase() === an &&
+        (x.doeDate?.trim() ?? "") === doe
+      )
     : -1;
 
   if (dupIdx >= 0) {
