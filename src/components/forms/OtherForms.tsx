@@ -291,31 +291,20 @@ export function SSIForm({ data, onChange }: { data: PatientRecord; onChange: Upd
           onChange={() => onChange({ ssi_type: "superficial", ssi_organ_space_site: undefined, ssi_os_criteria: undefined, ssi_os_criterion4: undefined })}
         />
         {data.ssi_type === "superficial" && (
-          <div className="ml-6 mt-3 space-y-3">
-            <div className="rounded-xl bg-lemon/20 border border-lemon-foreground/20 px-3 py-2.5 text-xs text-foreground/80 space-y-1">
-              <div className="font-semibold text-foreground/90 mb-1">เกณฑ์ Superficial Incisional SSI (ต้องครบทุกข้อ)</div>
-              <div>✅ <span className="font-medium">เกณฑ์ 1:</span> เกิดภายใน 30 วันหลังผ่าตัด (นับวันผ่าตัดเป็นวันที่ 1) <span className="text-muted-foreground">(ตรวจสอบอัตโนมัติ)</span></div>
-              <div>✅ <span className="font-medium">เกณฑ์ 2:</span> ติดเชื้อที่ผิวหนังและเนื้อเยื่อใต้ผิวหนังบริเวณแผลผ่าตัดเท่านั้น</div>
-              <div className="font-medium mt-1">เกณฑ์ 3: มีลักษณะอย่างน้อย 1 ข้อต่อไปนี้ ⬇️</div>
-              <div className="text-muted-foreground text-[11px] italic">
-                หมายเหตุ: ไม่รวม cellulitis, burn, circumcision, stitch abscess, stab wound หรือ pin site infection
-              </div>
-            </div>
-            <div className="space-y-1">
-              {[
-                "3.1 มีหนองออกมาจากแผลผ่าตัด",
-                "3.2 แยกเชื้อได้จากของเหลวหรือเนื้อเยื่อจากแผลผ่าตัดที่เก็บโดยวิธี Aseptic technique",
-                "3.3 แพทย์ให้เปิดปากแผลโดยไม่ได้เพาะเชื้อ และผู้ป่วยมีอาการอย่างน้อย 1 อย่าง (ปวด/กดเจ็บ, บวม, แดง, ร้อน)",
-                "3.4 แพทย์ที่ดูแลผู้ป่วยเป็นผู้ให้การวินิจฉัย SSI",
-              ].map((label, i) => (
-                <Check
-                  key={i}
-                  checked={!!(data.ssi_sup_criteria ?? []).includes(i + 1)}
-                  label={label}
-                  onChange={() => onChange({ ssi_sup_criteria: toggle(data.ssi_sup_criteria ?? [], i + 1) })}
-                />
-              ))}
-            </div>
+          <div className="ml-6 mt-2 space-y-1">
+            {[
+              "3.1 มีหนองออกมาจากแผลผ่าตัด",
+              "3.2 แยกเชื้อได้จากของเหลวหรือเนื้อเยื่อจากแผลผ่าตัดที่เก็บโดยวิธี Aseptic technique",
+              "3.3 แพทย์ให้เปิดปากแผลโดยไม่ได้เพาะเชื้อ และผู้ป่วยมีอาการอย่างน้อย 1 อย่าง (ปวด/กดเจ็บ, บวม, แดง, ร้อน)",
+              "3.4 แพทย์ที่ดูแลผู้ป่วยเป็นผู้ให้การวินิจฉัย SSI",
+            ].map((label, i) => (
+              <Check
+                key={i}
+                checked={!!(data.ssi_sup_criteria ?? []).includes(i + 1)}
+                label={label}
+                onChange={() => onChange({ ssi_sup_criteria: toggle(data.ssi_sup_criteria ?? [], i + 1) })}
+              />
+            ))}
           </div>
         )}
         <Radio
@@ -324,27 +313,19 @@ export function SSIForm({ data, onChange }: { data: PatientRecord; onChange: Upd
           onChange={() => onChange({ ssi_type: "deep", ssi_organ_space_site: undefined, ssi_os_criteria: undefined, ssi_os_criterion4: undefined, ssi_sup_criteria: undefined })}
         />
         {data.ssi_type === "deep" && (
-          <div className="ml-6 mt-3 space-y-3">
-            <div className="rounded-xl bg-lemon/20 border border-lemon-foreground/20 px-3 py-2.5 text-xs text-foreground/80 space-y-1">
-              <div className="font-semibold text-foreground/90 mb-1">เกณฑ์ Deep Incisional SSI (ต้องครบทุกข้อ)</div>
-              <div>✅ <span className="font-medium">เกณฑ์ 1:</span> เกิดภายใน 30 หรือ 90 วันหลังผ่าตัด ตามชนิดการผ่าตัด <span className="text-muted-foreground">(ตรวจสอบอัตโนมัติ)</span></div>
-              <div>✅ <span className="font-medium">เกณฑ์ 2:</span> ติดเชื้อที่เนื้อเยื่อชั้นพังผืดและกล้ามเนื้อ</div>
-              <div className="font-medium mt-1">เกณฑ์ 3: มีลักษณะอย่างน้อย 1 ข้อต่อไปนี้ ⬇️</div>
-            </div>
-            <div className="space-y-1">
-              {[
-                "3.1 มีหนองไหลจากชั้นใต้ผิวหนังบริเวณผ่าตัด (แต่ไม่ใช่จากอวัยวะ/ช่องโพรง)",
-                "3.2 แผลแยกเองหรือแพทย์เปิดแผล (ไม่ได้เพาะเชื้อ หรือเพาะแล้วไม่พบเชื้อก่อโรค) และผู้ป่วยมีไข้ > 38°C หรือปวด/กดเจ็บบริเวณแผล",
-                "3.3 พบฝี (Abscess) หรือหลักฐานการติดเชื้อ จากการตรวจโดยตรง / ผ่าตัดใหม่ / ตรวจเนื้อเยื่อ / ตรวจทางรังสีวิทยา",
-              ].map((label, i) => (
-                <Check
-                  key={i}
-                  checked={!!(data.ssi_deep_criteria ?? []).includes(i + 1)}
-                  label={label}
-                  onChange={() => onChange({ ssi_deep_criteria: toggle(data.ssi_deep_criteria ?? [], i + 1) })}
-                />
-              ))}
-            </div>
+          <div className="ml-6 mt-2 space-y-1">
+            {[
+              "3.1 มีหนองไหลจากชั้นใต้ผิวหนังบริเวณผ่าตัด (แต่ไม่ใช่จากอวัยวะ/ช่องโพรง)",
+              "3.2 แผลแยกเองหรือแพทย์เปิดแผล (ไม่ได้เพาะเชื้อ หรือเพาะแล้วไม่พบเชื้อก่อโรค) และผู้ป่วยมีไข้ > 38°C หรือปวด/กดเจ็บบริเวณแผล",
+              "3.3 พบฝี (Abscess) หรือหลักฐานการติดเชื้อ จากการตรวจโดยตรง / ผ่าตัดใหม่ / ตรวจเนื้อเยื่อ / ตรวจทางรังสีวิทยา",
+            ].map((label, i) => (
+              <Check
+                key={i}
+                checked={!!(data.ssi_deep_criteria ?? []).includes(i + 1)}
+                label={label}
+                onChange={() => onChange({ ssi_deep_criteria: toggle(data.ssi_deep_criteria ?? [], i + 1) })}
+              />
+            ))}
           </div>
         )}
         <Radio
@@ -353,14 +334,7 @@ export function SSIForm({ data, onChange }: { data: PatientRecord; onChange: Upd
           onChange={() => onChange({ ssi_type: "organ_space", ssi_sup_criteria: undefined, ssi_deep_criteria: undefined })}
         />
         {data.ssi_type === "organ_space" && (
-          <div className="ml-6 mt-3 space-y-3">
-            {/* เกณฑ์ข้อ 1-2 (ข้อมูล) */}
-            <div className="rounded-xl bg-lemon/20 border border-lemon-foreground/20 px-3 py-2.5 text-xs text-foreground/80 space-y-1">
-              <div className="font-semibold text-foreground/90 mb-1">เกณฑ์ Organ/Space SSI (ต้องครบทุกข้อ)</div>
-              <div>✅ <span className="font-medium">เกณฑ์ 1:</span> เกิดภายใน 30 หรือ 90 วันหลังผ่าตัด <span className="text-muted-foreground">(ตรวจสอบอัตโนมัติจากวันที่)</span></div>
-              <div>✅ <span className="font-medium">เกณฑ์ 2:</span> ติดเชื้อลึกกว่าผิวหนัง พังผืด หรือกล้ามเนื้อรอบแผลผ่าตัด</div>
-              <div className="font-medium mt-1">เกณฑ์ 3: มีลักษณะอย่างน้อย 1 ข้อต่อไปนี้ ⬇️</div>
-            </div>
+          <div className="ml-6 mt-2 space-y-2">
             {/* เกณฑ์ข้อ 3 checkboxes */}
             <div className="space-y-1">
               {[
