@@ -360,10 +360,23 @@ export function SSIForm({ data, onChange }: { data: PatientRecord; onChange: Upd
               </div>
             )}
             <Check
-              checked={!!(data.ssi_deep_criteria ?? []).includes(3)}
-              label="3.3 พบฝี (Abscess) หรือหลักฐานการติดเชื้อ จากการตรวจโดยตรง / ผ่าตัดใหม่ / ตรวจเนื้อเยื่อ / ตรวจทางรังสีวิทยา"
-              onChange={() => onChange({ ssi_deep_criteria: toggle(data.ssi_deep_criteria ?? [], 3) })}
+              checked={!!data.ssi_deep_crit33_found}
+              label="3.3 พบฝี (Abscess) หรือหลักฐานการติดเชื้อ"
+              onChange={() => onChange({ ssi_deep_crit33_found: !data.ssi_deep_crit33_found, ssi_deep_crit33_methods: undefined })}
             />
+            {data.ssi_deep_crit33_found && (
+              <div className="ml-6 space-y-1">
+                <div className="text-xs text-muted-foreground mb-0.5">จากวิธีการอย่างน้อย 1 วิธีต่อไปนี้:</div>
+                {["การตรวจพบโดยตรง", "ขณะผ่าตัดใหม่", "การตรวจเนื้อเยื่อ (histopathology)", "การตรวจทางรังสีวิทยา"].map((m, i) => (
+                  <Check
+                    key={i}
+                    checked={!!(data.ssi_deep_crit33_methods ?? []).includes(i + 1)}
+                    label={m}
+                    onChange={() => onChange({ ssi_deep_crit33_methods: toggle(data.ssi_deep_crit33_methods ?? [], i + 1) })}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         )}
         <Radio

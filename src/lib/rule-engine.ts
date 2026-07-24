@@ -139,7 +139,8 @@ export function evaluate(p: PatientRecord): RuleResult[] {
     const sup33 = !!p.ssi_sup_crit33_opened && (p.ssi_sup_crit33_sym?.length ?? 0) >= 1;
     const hasSupCriteria  = (p.ssi_sup_criteria  ?? []).length >= 1 || sup33;
     const deep32 = !!p.ssi_deep_crit32_opened && (p.ssi_deep_crit32_sym?.length ?? 0) >= 1;
-    const hasDeepCriteria = (p.ssi_deep_criteria ?? []).length >= 1 || deep32;
+    const deep33 = !!p.ssi_deep_crit33_found && (p.ssi_deep_crit33_methods?.length ?? 0) >= 1;
+    const hasDeepCriteria = (p.ssi_deep_criteria ?? []).length >= 1 || deep32 || deep33;
     const hasOsCriteria   = (p.ssi_os_criteria   ?? []).length >= 1;
     const isSuperficial   = p.ssi_type === "superficial";
     const isDeep          = p.ssi_type === "deep";
