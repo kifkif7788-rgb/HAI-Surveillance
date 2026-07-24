@@ -186,16 +186,6 @@ export function BSIForm({ data, onChange }: { data: PatientRecord; onChange: Upd
   );
 }
 
-const SSI_SYM = [
-  "1. มีหนองออกจากแผลผ่าตัด",
-  "2. แผลแยก/ปวด/บวม/แดง/ร้อน",
-  "3. ไข้ > 38°C",
-  "4. เพาะเชื้อจากแผลพบเชื้อก่อโรค",
-  "5. แพทย์ที่ดูแลผู้ป่วยวินิจฉัย surgical site infection (SSI)",
-  "6. ไม่มีลักษณะตามที่กล่าวมาข้างต้น",
-];
-const SSI_NONE = 6; // ข้อ 6 = ไม่มีอาการ (exclusive กับข้อ 1-5)
-
 const SSI_WOUND = [
   { key: "CW",  label: "1. Clean wound (CW)" },
   { key: "CCW", label: "2. Clean contaminated wound (CCW)" },
@@ -226,15 +216,6 @@ const SSI_ORGAN_SPACE_SITES = [
 ];
 
 export function SSIForm({ data, onChange }: { data: PatientRecord; onChange: Updater }) {
-  // ข้อ 6 (ไม่มีลักษณะ) เลือกแล้วล้างข้อ 1-5 และในทางกลับกัน
-  const toggleSign = (val: number) => {
-    const cur = data.ssi_symptoms ?? [];
-    const next = val === SSI_NONE
-      ? (cur.includes(SSI_NONE) ? [] : [SSI_NONE])
-      : toggle(cur.filter((n) => n !== SSI_NONE), val);
-    onChange({ ssi_symptoms: next });
-  };
-
   // วันที่ผ่าตัดหลายครั้ง (รองรับข้อมูลเก่าช่องเดียว)
   const surgeryDates = data.ssi_surgeryDates ?? (data.ssi_surgeryDate ? [data.ssi_surgeryDate] : []);
   const setSurgeryDates = (next: string[]) => onChange({ ssi_surgeryDates: next, ssi_surgery: next.length > 0 });
@@ -289,18 +270,11 @@ export function SSIForm({ data, onChange }: { data: PatientRecord; onChange: Upd
         )}
       </Sub>
 
-      {/* 10.4.2 infection signs + date */}
-      <Sub title="10.4.2 อาการ/อาการแสดงของการติดเชื้อที่แผลผ่าตัด">
+      {/* วันที่เริ่มมีอาการ (ใช้คำนวณ window อัตโนมัติ) */}
+      <Sub title="วันที่เริ่มมีอาการแสดงการติดเชื้อ">
         <DateField label="วันที่เริ่มมีอาการแสดง (ว/ด/ป)" value={data.ssi_signDate} onChange={(iso) => onChange({ ssi_signDate: iso })} />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-          {SSI_SYM.map((s, i) => (
-            <Check key={i} checked={!!data.ssi_symptoms?.includes(i + 1)} label={s}
-              onChange={() => toggleSign(i + 1)} />
-          ))}
-        </div>
-        {/* live surveillance-window status */}
         {gap !== null && (
-          <div className={cn("text-xs font-semibold rounded-xl px-3 py-2 mt-1",
+          <div className={cn("text-xs font-semibold rounded-xl px-3 py-2",
             inWindow ? "bg-lemon/40 text-lemon-foreground" : "bg-muted text-muted-foreground")}>
             {gap < 0
               ? "⚠️ วันที่มีอาการก่อนวันผ่าตัด — โปรดตรวจสอบวันที่"
