@@ -335,18 +335,35 @@ export function SSIForm({ data, onChange }: { data: PatientRecord; onChange: Upd
         />
         {data.ssi_type === "deep" && (
           <div className="ml-6 mt-2 space-y-1">
-            {[
-              "3.1 มีหนองไหลจากชั้นใต้ผิวหนังบริเวณผ่าตัด (แต่ไม่ใช่จากอวัยวะ/ช่องโพรง)",
-              "3.2 แผลแยกเองหรือแพทย์เปิดแผล (ไม่ได้เพาะเชื้อ หรือเพาะแล้วไม่พบเชื้อก่อโรค) และผู้ป่วยมีไข้ > 38°C หรือปวด/กดเจ็บบริเวณแผล",
-              "3.3 พบฝี (Abscess) หรือหลักฐานการติดเชื้อ จากการตรวจโดยตรง / ผ่าตัดใหม่ / ตรวจเนื้อเยื่อ / ตรวจทางรังสีวิทยา",
-            ].map((label, i) => (
-              <Check
-                key={i}
-                checked={!!(data.ssi_deep_criteria ?? []).includes(i + 1)}
-                label={label}
-                onChange={() => onChange({ ssi_deep_criteria: toggle(data.ssi_deep_criteria ?? [], i + 1) })}
-              />
-            ))}
+            <Check
+              checked={!!(data.ssi_deep_criteria ?? []).includes(1)}
+              label="3.1 มีหนองไหลจากชั้นใต้ผิวหนังบริเวณผ่าตัด (แต่ไม่ใช่จากอวัยวะ/ช่องโพรง)"
+              onChange={() => onChange({ ssi_deep_criteria: toggle(data.ssi_deep_criteria ?? [], 1) })}
+            />
+            {/* 3.2 — สองเงื่อนไขต้องครบทั้งคู่ */}
+            <Check
+              checked={!!data.ssi_deep_crit32_opened}
+              label="3.2 แผลแยกเองหรือแพทย์เปิดแผล (ไม่ได้เพาะเชื้อ หรือเพาะแล้วไม่พบเชื้อก่อโรค)"
+              onChange={() => onChange({ ssi_deep_crit32_opened: !data.ssi_deep_crit32_opened, ssi_deep_crit32_sym: undefined })}
+            />
+            {data.ssi_deep_crit32_opened && (
+              <div className="ml-6 space-y-1">
+                <div className="text-xs text-muted-foreground mb-0.5">และผู้ป่วยมีอาการอย่างน้อย 1 อย่าง:</div>
+                {["ไข้ > 38°C", "ปวด / กดเจ็บบริเวณแผล"].map((sym, i) => (
+                  <Check
+                    key={i}
+                    checked={!!(data.ssi_deep_crit32_sym ?? []).includes(i + 1)}
+                    label={sym}
+                    onChange={() => onChange({ ssi_deep_crit32_sym: toggle(data.ssi_deep_crit32_sym ?? [], i + 1) })}
+                  />
+                ))}
+              </div>
+            )}
+            <Check
+              checked={!!(data.ssi_deep_criteria ?? []).includes(3)}
+              label="3.3 พบฝี (Abscess) หรือหลักฐานการติดเชื้อ จากการตรวจโดยตรง / ผ่าตัดใหม่ / ตรวจเนื้อเยื่อ / ตรวจทางรังสีวิทยา"
+              onChange={() => onChange({ ssi_deep_criteria: toggle(data.ssi_deep_criteria ?? [], 3) })}
+            />
           </div>
         )}
         <Radio
