@@ -141,7 +141,8 @@ export function evaluate(p: PatientRecord): RuleResult[] {
     const deep32 = !!p.ssi_deep_crit32_opened && (p.ssi_deep_crit32_sym?.length ?? 0) >= 1;
     const deep33 = !!p.ssi_deep_crit33_found && (p.ssi_deep_crit33_methods?.length ?? 0) >= 1;
     const hasDeepCriteria = (p.ssi_deep_criteria ?? []).length >= 1 || deep32 || deep33;
-    const hasOsCriteria   = (p.ssi_os_criteria   ?? []).length >= 1;
+    const os33 = !!p.ssi_os_crit33_found && (p.ssi_os_crit33_methods?.length ?? 0) >= 1;
+    const hasOsCriteria   = (p.ssi_os_criteria   ?? []).length >= 1 || os33;
     const isSuperficial   = p.ssi_type === "superficial";
     const isDeep          = p.ssi_type === "deep";
     const isOrganSpace    = p.ssi_type === "organ_space";

@@ -58,7 +58,9 @@ export interface PatientRecord {
   ssi_deep_crit32_sym?: number[];                     // 10.4.4 เกณฑ์ 3.2 อาการ ≥1: 1=ไข้>38°C, 2=ปวด/กดเจ็บ
   ssi_deep_crit33_found?: boolean;                    // 10.4.4 เกณฑ์ 3.3: พบฝี/หลักฐานการติดเชื้อ
   ssi_deep_crit33_methods?: number[];                 // 10.4.4 เกณฑ์ 3.3 วิธีตรวจ ≥1: 1=ตรวจโดยตรง, 2=ผ่าตัดใหม่, 3=ตรวจเนื้อเยื่อ, 4=รังสีวิทยา
-  ssi_os_criteria?: number[];                         // 10.4.4 เกณฑ์ O/S SSI ข้อ 3.1/3.2/3.3 (≥1)
+  ssi_os_criteria?: number[];                         // 10.4.4 เกณฑ์ O/S SSI ข้อ 3.1/3.2 (≥1)
+  ssi_os_crit33_found?: boolean;                      // 10.4.4 เกณฑ์ O/S 3.3: พบฝี/หลักฐานการติดเชื้อ
+  ssi_os_crit33_methods?: number[];                   // 10.4.4 เกณฑ์ O/S 3.3 วิธีตรวจ ≥1: 1=ตรวจโดยตรง, 2=ผ่าตัดใหม่, 3=ตรวจเนื้อเยื่อ, 4=รังสีวิทยา
   ssi_os_criterion4?: boolean;                        // 10.4.4 เกณฑ์ O/S SSI ข้อ 4 (เข้าเกณฑ์ site)
   // 10.5 GI (new structured fields)
   gi_type?: "gastroenteritis" | "cdiff_pseudo" | "nec" | "gi_tract"; // ประเภท GI

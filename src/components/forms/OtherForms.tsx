@@ -391,7 +391,6 @@ export function SSIForm({ data, onChange }: { data: PatientRecord; onChange: Upd
               {[
                 "3.1 มีหนองออกจากท่อระบายที่ใส่ไว้ภายในอวัยวะหรือช่องโพรงในร่างกาย",
                 "3.2 แยกเชื้อได้จากของเหลวหรือเนื้อเยื่อจากอวัยวะหรือช่องโพรงในร่างกาย",
-                "3.3 พบฝี (Abscess) หรือหลักฐานการติดเชื้อ จากการตรวจโดยตรง / ผ่าตัดใหม่ / ตรวจเนื้อเยื่อ / ตรวจทางรังสีวิทยา",
               ].map((label, i) => (
                 <Check
                   key={i}
@@ -400,6 +399,24 @@ export function SSIForm({ data, onChange }: { data: PatientRecord; onChange: Upd
                   onChange={() => onChange({ ssi_os_criteria: toggle(data.ssi_os_criteria ?? [], i + 1) })}
                 />
               ))}
+              <Check
+                checked={!!data.ssi_os_crit33_found}
+                label="3.3 พบฝี (Abscess) หรือหลักฐานการติดเชื้อ"
+                onChange={() => onChange({ ssi_os_crit33_found: !data.ssi_os_crit33_found, ssi_os_crit33_methods: undefined })}
+              />
+              {data.ssi_os_crit33_found && (
+                <div className="ml-6 space-y-1">
+                  <div className="text-xs text-muted-foreground mb-0.5">จากวิธีการอย่างน้อย 1 วิธีต่อไปนี้:</div>
+                  {["การตรวจพบโดยตรง", "ขณะผ่าตัดใหม่", "การตรวจเนื้อเยื่อ (histopathology)", "การตรวจทางรังสีวิทยา"].map((m, i) => (
+                    <Check
+                      key={i}
+                      checked={!!(data.ssi_os_crit33_methods ?? []).includes(i + 1)}
+                      label={m}
+                      onChange={() => onChange({ ssi_os_crit33_methods: toggle(data.ssi_os_crit33_methods ?? [], i + 1) })}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
             {/* เกณฑ์ข้อ 4 */}
             <Check
