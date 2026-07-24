@@ -292,19 +292,40 @@ export function SSIForm({ data, onChange }: { data: PatientRecord; onChange: Upd
         />
         {data.ssi_type === "superficial" && (
           <div className="ml-6 mt-2 space-y-1">
-            {[
-              "3.1 มีหนองออกมาจากแผลผ่าตัด",
-              "3.2 แยกเชื้อได้จากของเหลวหรือเนื้อเยื่อจากแผลผ่าตัดที่เก็บโดยวิธี Aseptic technique",
-              "3.3 แพทย์ให้เปิดปากแผลโดยไม่ได้เพาะเชื้อ และผู้ป่วยมีอาการอย่างน้อย 1 อย่าง (ปวด/กดเจ็บ, บวม, แดง, ร้อน)",
-              "3.4 แพทย์ที่ดูแลผู้ป่วยเป็นผู้ให้การวินิจฉัย SSI",
-            ].map((label, i) => (
-              <Check
-                key={i}
-                checked={!!(data.ssi_sup_criteria ?? []).includes(i + 1)}
-                label={label}
-                onChange={() => onChange({ ssi_sup_criteria: toggle(data.ssi_sup_criteria ?? [], i + 1) })}
-              />
-            ))}
+            <Check
+              checked={!!(data.ssi_sup_criteria ?? []).includes(1)}
+              label="3.1 มีหนองออกมาจากแผลผ่าตัด"
+              onChange={() => onChange({ ssi_sup_criteria: toggle(data.ssi_sup_criteria ?? [], 1) })}
+            />
+            <Check
+              checked={!!(data.ssi_sup_criteria ?? []).includes(2)}
+              label="3.2 แยกเชื้อได้จากของเหลวหรือเนื้อเยื่อจากแผลผ่าตัดที่เก็บโดยวิธี Aseptic technique"
+              onChange={() => onChange({ ssi_sup_criteria: toggle(data.ssi_sup_criteria ?? [], 2) })}
+            />
+            {/* 3.3 — สองเงื่อนไขต้องครบทั้งคู่ */}
+            <Check
+              checked={!!data.ssi_sup_crit33_opened}
+              label="3.3 แพทย์ให้เปิดปากแผลโดยไม่ได้เพาะเชื้อ"
+              onChange={() => onChange({ ssi_sup_crit33_opened: !data.ssi_sup_crit33_opened, ssi_sup_crit33_sym: undefined })}
+            />
+            {data.ssi_sup_crit33_opened && (
+              <div className="ml-6 space-y-1">
+                <div className="text-xs text-muted-foreground mb-0.5">และผู้ป่วยมีอาการอย่างน้อย 1 อย่าง:</div>
+                {["ปวด / กดเจ็บ", "บวม", "แดง", "ร้อน"].map((sym, i) => (
+                  <Check
+                    key={i}
+                    checked={!!(data.ssi_sup_crit33_sym ?? []).includes(i + 1)}
+                    label={sym}
+                    onChange={() => onChange({ ssi_sup_crit33_sym: toggle(data.ssi_sup_crit33_sym ?? [], i + 1) })}
+                  />
+                ))}
+              </div>
+            )}
+            <Check
+              checked={!!(data.ssi_sup_criteria ?? []).includes(4)}
+              label="3.4 แพทย์ที่ดูแลผู้ป่วยเป็นผู้ให้การวินิจฉัย SSI"
+              onChange={() => onChange({ ssi_sup_criteria: toggle(data.ssi_sup_criteria ?? [], 4) })}
+            />
           </div>
         )}
         <Radio

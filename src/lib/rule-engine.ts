@@ -136,7 +136,8 @@ export function evaluate(p: PatientRecord): RuleResult[] {
   if (p.sites.includes("10.4")) {
     // ข้อ 6 = "ไม่มีลักษณะ..." ไม่นับเป็นอาการ; นับเฉพาะข้อ 1-5
     const hasSym          = (p.ssi_symptoms ?? []).some((n) => n >= 1 && n <= 5);
-    const hasSupCriteria  = (p.ssi_sup_criteria  ?? []).length >= 1;
+    const sup33 = !!p.ssi_sup_crit33_opened && (p.ssi_sup_crit33_sym?.length ?? 0) >= 1;
+    const hasSupCriteria  = (p.ssi_sup_criteria  ?? []).length >= 1 || sup33;
     const hasDeepCriteria = (p.ssi_deep_criteria ?? []).length >= 1;
     const hasOsCriteria   = (p.ssi_os_criteria   ?? []).length >= 1;
     const isSuperficial   = p.ssi_type === "superficial";
